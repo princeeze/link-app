@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 export default function Signup() {
   return (
     <div>
-      <Button>Signup</Button>
+      <Button variant={"secondary"}>Signup</Button>
     </div>
   );
 }
