@@ -1,4 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-  
+
+@layer base {
+  .heading-m {
+    @apply text-[32px] leading-[150%] font-bold;
+  }
+
+  .heading-s {
+    @apply text-base leading-[150%] font-semibold;
+  }
+
+  .body-m {
+    @apply text-base leading-[150%] font-normal;
+  }
+
+  .body-s {
+    @apply text-xs leading-[150%] font-normal;
+  }
+}
