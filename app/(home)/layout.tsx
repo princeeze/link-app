@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/navbar";
 
 const inter = Instrument_Sans({ subsets: ["latin"] });
 
