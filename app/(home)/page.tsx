@@ -1,13 +1,14 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
-const Home = () => {
-  return (
-    <div>
-      <p>Home</p>
-      <Link href="/login">Login</Link>
-      <Link href="/signup">Signup</Link>
-    </div>
-  );
-};
+import { createClient } from "@/utils/supabase/server";
 
-export default Home;
+export default async function PrivatePage() {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    redirect("/login");
+  }
+
+  return <p>Hello {data.user.email}</p>;
+}
