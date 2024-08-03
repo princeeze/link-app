@@ -1,9 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
-import { loginSchema } from "@/lib/schema";
+import { loginSchema, signupSchema } from "@/lib/schema";
 import { createClient } from "@/utils/supabase/server";
 
 export async function login(values: z.infer<typeof loginSchema>) {
@@ -26,22 +25,26 @@ export async function login(values: z.infer<typeof loginSchema>) {
   }
 }
 
-export async function signup(formData: FormData) {
+export async function signup(values: z.infer<typeof signupSchema>) {
   const supabase = createClient();
+  const data = signupSchema.parse(values);
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  try {
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+    });
 
-  const { error } = await supabase.auth.signUp(data);
+    if (error) {
+      return { error: error.message };
+    }
 
-  if (error) {
-    redirect("/error");
+    revalidatePath("/");
+    return { message: "Signup successful" };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { error: error.errors.map((e) => e.message).join(", ") };
+    }
+    return { error: "Internal server error" };
   }
-
-  revalidatePath("/", "layout");
-  redirect("/");
 }

@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { EnvelopeSimple, Spinner } from "@phosphor-icons/react";
-import { login } from "./actions";
+import { EnvelopeSimple, LockKey, Spinner } from "@phosphor-icons/react";
+import { login } from "../actions";
 import { loginSchema } from "@/lib/schema";
 import * as React from "react";
 import { useRouter } from "next/navigation";
@@ -108,7 +108,8 @@ export default function Login() {
                   <span className="body-s text-grey-dark">Password</span>
                 </FormLabel>
                 <div className="relative border-borders flex items-center max-w-full">
-                  <EnvelopeSimple
+                  <LockKey
+                    weight="fill"
                     className="absolute left-4 top-1/2 -translate-y-1/2 transform text-grey-default"
                     size={16}
                   />
