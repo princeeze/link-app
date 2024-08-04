@@ -9,7 +9,7 @@ export default function AuthLayout({
 }) {
   return (
     <main>
-      <div className="bg-grey-light flex flex-col gap-[51px] items-center w-screen h-screen px-6 justify-center">
+      <div className="bg-grey-light flex flex-col gap-[51px] items-center w-screen p-6 justify-center">
         <Link href="/">
           <Image src={logo} alt="logo" />
         </Link>
