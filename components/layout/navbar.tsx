@@ -17,7 +17,7 @@ export default function Navbar() {
       <div className="flex gap-4">
         <Link
           className={cn(
-            " rounded-lg px-[27px] heading-s flex items-center gap-2 py-[11px]",
+            " rounded-lg px-[27px] heading-s flex items-center gap-2 hover:text-purple-default py-[11px]",
             pathname === "/dashboard/links"
               ? "text-purple-default bg-purple-light"
               : "text-grey-default bg-white"
@@ -29,7 +29,7 @@ export default function Navbar() {
         </Link>
         <Link
           className={cn(
-            " rounded-lg px-[27px] heading-s flex items-center gap-2 py-[11px]",
+            " rounded-lg px-[27px] heading-s flex items-center gap-2 hover:text-purple-default py-[11px]",
             pathname === "/dashboard/profile"
               ? "text-purple-default bg-purple-light"
               : "text-grey-default bg-white"
