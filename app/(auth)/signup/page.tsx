@@ -44,7 +44,7 @@ export default function Signup() {
       setErrorMessage(result.error);
     } else {
       result.message ? setErrorMessage(result.message) : "";
-      router.push("/dashboard/links");
+      router.push("/");
     }
 
     setIsLoading(false);

@@ -21,7 +21,6 @@ import { login } from "../actions";
 import { loginSchema } from "@/lib/schema";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
 
 export default function Login() {
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -44,7 +43,7 @@ export default function Login() {
       setErrorMessage(result.error);
     } else {
       setErrorMessage(null);
-      router.push("/dashboard/links");
+      router.push("/");
     }
 
     setIsLoading(false);
