@@ -119,6 +119,7 @@ const FormControl = React.forwardRef<
       ref={ref}
       id={formItemId}
       aria-describedby={
+        // eslint-disable-next-line unicorn/no-negated-condition
         !error
           ? `${formDescriptionId}`
           : `${formDescriptionId} ${formMessageId}`
