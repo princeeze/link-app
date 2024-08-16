@@ -1,0 +1,31 @@
+{
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": [
+    "^(assert|buffer|child_process|cluster|crypto|dns|domain|events|fs|http|https|net|os|path|punycode|querystring|readline|stream|string_decoder|tls|dgram|dns|url|util|vm|zlib)(/.*|$)",
+    "",
+    "^react(-dom)?(/.*)?$",
+    "^next",
+    "",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@types/(.*)$",
+    "^@/types/(.*)$",
+    "",
+    "^@/components/(.*)$",
+    "",
+    "^@/utils/(.*)$",
+    "",
+    "^@/lib/(.*)$",
+    "",
+    "^@/hooks/(.*)$",
+    "^@/styles/(.*)$",
+
+    "",
+    "^[./]"
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderTypeScriptVersion": "5.0.0"
+}
