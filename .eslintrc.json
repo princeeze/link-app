@@ -1,3 +1,18 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "plugin:unicorn/all"],
+  "rules": {
+    "unicorn/prevent-abbreviations": "off",
+    "unicorn/no-keyword-prefix": "off",
+    "unicorn/no-null": "off",
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": ["./*", "../*"]
+      }
+    ],
+    "no-unused-vars": [
+      "warn",
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }
+    ]
+  }
 }

@@ -1,8 +1,17 @@
+"use client";
+
 import Image from "next/image";
+
 import profile from "@/public/image.png";
+
+import Card from "@/components/ui/card";
+
+import { useFormDataStore } from "@/lib/store";
+
 export default function MobilePhone() {
+  const formData = useFormDataStore((state) => state.formData);
   return (
-    <div className="bg-white rounded-xl w-1/3 py-4 flex justify-center items-center h-full">
+    <div className="relative flex h-full w-2/5 items-center justify-center rounded-xl bg-white py-4">
       <svg
         height="100"
         className="h-full"
@@ -19,16 +28,31 @@ export default function MobilePhone() {
           fill="white"
           stroke="#737373"
         />
-
-        <foreignObject className="w-full h-full">
+      </svg>
+      <div className="absolute flex h-full min-w-[60%] max-w-40 flex-col items-center gap-10 pt-[70px]">
+        <div className="flex flex-col items-center gap-5">
           <Image
             src={profile}
             alt="profile"
-            className="rounded-full outline w-24 h-24 object-cover outline-4 outline-purple-default "
+            className="h-16 w-16 rounded-full object-cover outline outline-4 outline-purple-default"
           />
-          <a href="./fjio">Wow this is a link</a>
-        </foreignObject>
-      </svg>
+          <div className="flex flex-col items-center gap-1">
+            <span className="body-m text-[18px] font-semibold text-grey-dark">
+              Ben Wright
+            </span>
+            <span className="body-s text-grey-default">
+              benwright@email.com
+            </span>
+          </div>
+        </div>
+        <div className="flex w-full flex-col gap-4">
+          {formData.map((item: any) => {
+            return (
+              <Card variant={item.platform} link={item.link} key={item.link} />
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

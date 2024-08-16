@@ -1,9 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
 import { z } from "zod";
-import { loginSchema, signupSchema } from "@/lib/schema";
+
 import { createClient } from "@/utils/supabase/server";
+
+import { loginSchema, signupSchema } from "@/lib/schema";
 
 export async function login(values: z.infer<typeof loginSchema>) {
   const supabase = createClient();
