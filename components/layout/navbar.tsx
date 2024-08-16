@@ -1,26 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import logo from "@/public/logo.svg";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { usePathname, useRouter } from "next/navigation";
+
+import { logout } from "@/app/(auth)/auth-client";
+import logo from "@/public/logo.svg";
 import { Link as PLink, UserCircle } from "@phosphor-icons/react";
+
+import { Button } from "@/components/ui/button";
+
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
 
   return (
-    <div className="bg-white flex justify-between items-center w-full px-6 py-2  rounded-xl">
+    <div className="flex w-full items-center justify-between rounded-xl bg-white px-6 py-2">
       <Image src={logo} alt="logo" className="w-36" />
       <div className="flex gap-4">
         <Link
           className={cn(
-            " rounded-lg px-[27px] heading-s flex items-center gap-2 hover:text-purple-default py-[11px]",
+            "heading-s flex items-center gap-2 rounded-lg px-[27px] py-[11px] hover:text-purple-default",
             pathname === "/dashboard/links"
-              ? "text-purple-default bg-purple-light"
-              : "text-grey-default bg-white"
+              ? "bg-purple-light text-purple-default"
+              : "bg-white text-grey-default",
           )}
           href={"/dashboard/links"}
         >
@@ -29,10 +39,10 @@ export default function Navbar() {
         </Link>
         <Link
           className={cn(
-            " rounded-lg px-[27px] heading-s flex items-center gap-2 hover:text-purple-default py-[11px]",
+            "heading-s flex items-center gap-2 rounded-lg px-[27px] py-[11px] hover:text-purple-default",
             pathname === "/dashboard/profile"
-              ? "text-purple-default bg-purple-light"
-              : "text-grey-default bg-white"
+              ? "bg-purple-light text-purple-default"
+              : "bg-white text-grey-default",
           )}
           href={"/dashboard/profile"}
         >
@@ -40,7 +50,16 @@ export default function Navbar() {
           Profile
         </Link>
       </div>
-      <Button variant={"secondary"}>Preview</Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant={"destructive"}
+          className="text-red hover:bg-red/10"
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
+        <Button variant={"secondary"}>Preview</Button>
+      </div>
     </div>
   );
 }
