@@ -45,6 +45,7 @@ export default function AuthForm() {
     const result = await login(values);
     if (result.error) {
       setErrorMessage(result.error);
+      setIsLoading(false);
     } else {
       setSuccessMessage(result.message || null);
       setTimeout(() => {

@@ -3,7 +3,7 @@ import LinkForm from "@/components/layout/linkform";
 export default async function Links() {
   return (
     <div className="flex max-h-full w-full flex-col">
-      <div className="flex flex-col gap-10">
+      <div className="flex h-full flex-col gap-10">
         <div>
           <h1 className="heading-m pb-2 text-grey-dark">
             Customize your links

@@ -40,6 +40,7 @@ import { cn } from "@/lib/utils";
 
 export default function LinkForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [linksLoading, setLinksLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("github");
@@ -55,12 +56,7 @@ export default function LinkForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      links: [
-        {
-          platform: "github",
-          link: "",
-        },
-      ],
+      links: [],
     },
   });
 
@@ -68,6 +64,7 @@ export default function LinkForm() {
     name: "links",
     control: form.control,
   });
+
   //setup zustand to watch for changes
   const setFormData = useFormDataStore((state) => state.setFormData);
   const formData = useFormDataStore((state) => state.formData);
@@ -78,18 +75,18 @@ export default function LinkForm() {
 
   //fetch links from supabase
   useEffect(() => {
-    setIsLoading(true);
+    setLinksLoading(true);
     async function fetchLinks() {
-      setIsLoading(true);
       const result = await getLinks();
       console.log("result", result);
       if (Array.isArray(result)) {
         console.log("result", result);
         form.reset({ links: result });
+        setLinksLoading(false);
       } else {
         console.error("Error fetching links:", result.error);
+        setLinksLoading(false);
       }
-      setIsLoading(false);
     }
     fetchLinks();
   }, [form]);
@@ -108,7 +105,7 @@ export default function LinkForm() {
     setIsLoading(false);
   };
 
-  return (
+  const allLinks = (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -261,5 +258,13 @@ export default function LinkForm() {
         </FormItem>
       </form>
     </Form>
+  );
+
+  return linksLoading ? (
+    <div className="flex h-full w-full items-center justify-center">
+      Loading...
+    </div>
+  ) : (
+    <>{allLinks}</>
   );
 }
