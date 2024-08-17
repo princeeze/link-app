@@ -42,10 +42,12 @@ export default function AuthForm() {
     if (result.error) {
       setErrorMessage(result.error);
     } else {
-      setErrorMessage(null);
-      router.push("/dashboard/links");
+      setErrorMessage(result.message || null);
+      setTimeout(() => {
+        router.push("/dashboard/links");
+      }, 100); // Small delay to ensure session is fully updated
     }
-    setIsLoading(false);
+    result.message ? setIsLoading(true) : setIsLoading(false);
   }
 
   const handleInputChange = () => {
