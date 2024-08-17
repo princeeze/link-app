@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { updateLinks } from "@/app/(home)/dashboard/links/links";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Spinner } from "@phosphor-icons/react";
 import {
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -40,6 +42,7 @@ export default function Links() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("github");
+  const [successMessage, setSuccessMessage] = useState<boolean>(true);
 
   const placeholders: Record<string, string> = {
     github: "e.g. https://www.github.com/johnappleseed",
@@ -54,21 +57,10 @@ export default function Links() {
     },
   });
 
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      name: "links",
-      control: form.control,
-    },
-  );
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    setErrorMessage(null);
-    console.log("values:", values);
-
-    console.log("store:", formData);
-    setIsLoading(false);
-  };
+  const { fields, append, remove } = useFieldArray({
+    name: "links",
+    control: form.control,
+  });
 
   const setFormData = useFormDataStore((state) => state.setFormData);
   const formData = useFormDataStore((state) => state.formData);
@@ -78,6 +70,19 @@ export default function Links() {
   useEffect(() => {
     setFormData(watch);
   }, [watch, setFormData]);
+
+  const onSubmit = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    console.log(formData);
+    const result = await updateLinks(formData);
+    if (result.error) {
+      setErrorMessage(result.error);
+    } else {
+      setErrorMessage("bEAUTIFYL");
+    }
+    setIsLoading(false);
+  };
 
   return (
     <div className="flex max-h-full w-full flex-col">
@@ -227,6 +232,12 @@ export default function Links() {
 
             <FormItem>
               <FormMessage />
+              <FormDescription>
+                {successMessage && <span>{successMessage}</span>}
+                {errorMessage && (
+                  <span className="text-red">{errorMessage}</span>
+                )}
+              </FormDescription>
               <FormControl>
                 <Button disabled={isLoading}>
                   {isLoading && (
