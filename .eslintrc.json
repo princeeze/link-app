@@ -4,6 +4,7 @@
     "unicorn/prevent-abbreviations": "off",
     "unicorn/no-keyword-prefix": "off",
     "unicorn/no-null": "off",
+    "unicorn/no-negated-condition": "off",
     "no-restricted-imports": [
       "warn",
       {
