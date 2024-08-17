@@ -1,7 +1,10 @@
+import { z } from "zod";
 import create from "zustand";
 
+import { formSchema } from "@/lib/schema";
+
 interface FormDataState {
-  formData: any;
+  formData: z.infer<typeof formSchema>["links"];
   setFormData: (data: any) => void;
 }
 
