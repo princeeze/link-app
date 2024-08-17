@@ -25,7 +25,12 @@ export async function getLinks() {
       throw error;
     }
 
-    return data;
+    const links: z.infer<typeof linkSchema>[] = data.map((link) => ({
+      platform: link.platform,
+      link: link.link,
+    }));
+
+    return links;
   } catch (error: any) {
     return { error: error.message };
   }
