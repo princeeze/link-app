@@ -1,6 +1,6 @@
 import LinkForm from "@/components/layout/linkform";
 
-export default async function Links() {
+export default function Links() {
   return (
     <div className="flex max-h-full w-full flex-col">
       <div className="flex h-full flex-col gap-10">
