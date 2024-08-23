@@ -78,9 +78,7 @@ export default function LinkForm() {
     setLinksLoading(true);
     async function fetchLinks() {
       const result = await getLinks();
-      console.log("result", result);
       if (Array.isArray(result)) {
-        console.log("result", result);
         form.reset({ links: result });
         setLinksLoading(false);
       } else {
