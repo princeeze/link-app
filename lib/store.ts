@@ -1,5 +1,5 @@
 import { z } from "zod";
-import create from "zustand";
+import { create } from "zustand";
 
 import { formSchema } from "@/lib/schema";
 
