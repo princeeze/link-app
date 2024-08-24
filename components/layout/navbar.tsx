@@ -5,11 +5,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { logout } from "@/app/(auth)/auth-client";
+import logoSmall from "@/public/logo-small.svg";
 import logo from "@/public/logo.svg";
-import { Link as PLink, UserCircle } from "@phosphor-icons/react";
+import { ClockUser, Link as PLink, UserCircle } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
-
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
@@ -23,7 +23,8 @@ export default function Navbar() {
 
   return (
     <div className="flex w-full items-center justify-between rounded-xl bg-white px-6 py-2">
-      <Image src={logo} alt="logo" className="w-36" />
+      <Image src={logo} alt="logo" className="hidden w-36 sm:inline" />
+      <Image src={logoSmall} alt="logo" className="w-8 md:hidden" />
       <div className="flex gap-4">
         <Link
           className={cn(
@@ -35,7 +36,7 @@ export default function Navbar() {
           href={"/dashboard/links"}
         >
           <PLink weight="bold" />
-          Links
+          <span className="hidden sm:inline"> Links</span>
         </Link>
         <Link
           className={cn(
@@ -47,7 +48,7 @@ export default function Navbar() {
           href={"/dashboard/profile"}
         >
           <UserCircle weight="bold" />
-          Profile
+          <span className="hidden sm:inline"> Profile</span>
         </Link>
       </div>
       <div className="flex items-center gap-2">
@@ -56,7 +57,8 @@ export default function Navbar() {
           className="text-red hover:bg-red/10"
           onClick={handleLogout}
         >
-          Logout
+          <ClockUser />
+          <span className="hidden sm:inline"> Logout</span>
         </Button>
         <Button variant={"secondary"}>Preview</Button>
       </div>
