@@ -20,7 +20,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import { loginSchema, signupSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 
@@ -123,7 +122,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
-                    placeholder="At least 8 characters"
+                    placeholder="At least 6 characters"
                     type="password"
                     className={cn(
                       "pl-11 pr-4",
@@ -158,7 +157,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
-                    placeholder="At least 8 characters"
+                    placeholder="At least 6 characters"
                     type="password"
                     className={cn(
                       "pl-11 pr-4",
@@ -181,7 +180,7 @@ export default function SignupForm() {
           {errorMessage ? (
             <span>{errorMessage}</span>
           ) : (
-            "Passwords must contain at least 8 characters"
+            "Passwords must contain at least 6 characters"
           )}
         </FormDescription>
         <FormItem>
