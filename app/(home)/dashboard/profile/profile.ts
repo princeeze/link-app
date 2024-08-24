@@ -51,3 +51,24 @@ export async function uploadFile(formData: FormData) {
     throw error; // Re-throw the error to be handled by the caller
   }
 }
+
+export async function checkUsernameAvailability(username: string) {
+  const supabase = createClient();
+
+  try {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("username")
+      .eq("username", username);
+    if (error) {
+      throw error;
+    }
+    if (data && data.length > 0) {
+      return false;
+    }
+    return true;
+  } catch (error: any) {
+    console.error("Error checking username availability:", error.message);
+    throw error;
+  }
+}
