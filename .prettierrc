@@ -5,7 +5,6 @@
   ],
   "importOrder": [
     "^(assert|buffer|child_process|cluster|crypto|dns|domain|events|fs|http|https|net|os|path|punycode|querystring|readline|stream|string_decoder|tls|dgram|dns|url|util|vm|zlib)(/.*|$)",
-    "",
     "^react(-dom)?(/.*)?$",
     "^next",
     "",
@@ -13,17 +12,11 @@
     "",
     "^@types/(.*)$",
     "^@/types/(.*)$",
-    "",
     "^@/components/(.*)$",
-    "",
     "^@/utils/(.*)$",
-    "",
     "^@/lib/(.*)$",
-    "",
     "^@/hooks/(.*)$",
     "^@/styles/(.*)$",
-
-    "",
     "^[./]"
   ],
   "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
