@@ -12,9 +12,7 @@ export default function DashboardLayout({
     <section className="flex h-screen flex-col gap-4 bg-grey-light p-4">
       <Navbar />
       <main className="flex flex-1 gap-4">
-        <Suspense fallback={<div>Loading...</div>}>
-          <MobilePhone />
-        </Suspense>
+        <MobilePhone />
         <div className="flex max-h-full w-full overflow-y-scroll rounded-md bg-white p-10">
           {children}
         </div>
