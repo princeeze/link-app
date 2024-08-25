@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,6 +35,9 @@ export default function AuthForm() {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(
+    null,
+  );
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
@@ -41,11 +45,14 @@ export default function AuthForm() {
     const result = await login(values);
     if (result.error) {
       setErrorMessage(result.error);
+      setIsLoading(false);
     } else {
-      setErrorMessage(null);
-      router.push("/dashboard/links");
+      setSuccessMessage(result.message || null);
+      setTimeout(() => {
+        router.push("/dashboard/links");
+      }, 100); // Small delay to ensure session is fully updated
+      successMessage ? setIsLoading(true) : setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   const handleInputChange = () => {
@@ -128,6 +135,9 @@ export default function AuthForm() {
             </FormItem>
           )}
         />
+        <FormDescription>
+          {successMessage && <span>{successMessage}</span>}
+        </FormDescription>
         <FormItem>
           <FormControl>
             <Button className="w-full" disabled={isLoading}>

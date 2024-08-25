@@ -14,7 +14,7 @@ export const signupSchema = z
 
     password: z
       .string()
-      .min(4, "Too short")
+      .min(6, "Too short")
       .regex(/[A-Za-z]/, "Password must contain at least one letter")
       .regex(/\d/, "Password must contain at least one number"),
 
@@ -40,4 +40,21 @@ export const linkSchema = z.object({
 
 export const formSchema = z.object({
   links: z.array(linkSchema).min(1, "At least one link is required"),
+});
+
+export const profileFormSchema = z.object({
+  name: z.string().min(3, "Too short"),
+  username: z.string().min(4, "Too short").regex(/^\w+$/, "Invalid Username"),
+  email: z.string().min(1, "Required").email("Invalid address"),
+  avatar: z
+    .any()
+    .refine((files) => files?.length === 1, "Profile picture is required")
+    .refine(
+      (files) => files?.[0]?.size <= 1024 * 1024,
+      "Image must be less than 1MB",
+    )
+    .refine(
+      (files) => ["image/jpeg", "image/png"].includes(files?.[0]?.type),
+      "Only PNG or JPG formats are allowed",
+    ),
 });

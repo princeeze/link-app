@@ -1,20 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import profile from "@/public/image.png";
 
 import Card from "@/components/ui/card";
-
 import { useFormDataStore } from "@/lib/store";
 
 export default function MobilePhone() {
   const formData = useFormDataStore((state) => state.formData);
+  const profileData = useFormDataStore((state) => state.profileData);
+
+  const [preview, setPreview] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (profileData?.avatar && profileData.avatar[0]) {
+      const fileOrUrl = profileData.avatar[0];
+      if (typeof fileOrUrl === "string") {
+        setPreview(fileOrUrl);
+      } else {
+        setPreview(URL.createObjectURL(fileOrUrl));
+      }
+    }
+  }, [profileData?.avatar]);
+
   return (
-    <div className="relative flex h-full w-2/5 items-center justify-center rounded-xl bg-white py-4">
+    <div className="relative hidden h-full w-2/5 items-baseline justify-center rounded-xl bg-white py-4 md:flex">
       <svg
         height="100"
-        className="h-full"
+        className="h-[450px]"
         viewBox="0 0 308 632"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -32,16 +47,18 @@ export default function MobilePhone() {
       <div className="absolute flex h-full min-w-[60%] max-w-40 flex-col items-center gap-10 pt-[70px]">
         <div className="flex flex-col items-center gap-5">
           <Image
-            src={profile}
+            src={preview ?? profile}
             alt="profile"
+            width={100}
+            height={100}
             className="h-16 w-16 rounded-full object-cover outline outline-4 outline-purple-default"
           />
           <div className="flex flex-col items-center gap-1">
             <span className="body-m text-[18px] font-semibold text-grey-dark">
-              Ben Wright
+              {profileData?.name}
             </span>
             <span className="body-s text-grey-default">
-              benwright@email.com
+              {profileData?.email}
             </span>
           </div>
         </div>
