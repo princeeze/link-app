@@ -16,8 +16,12 @@ export default function MobilePhone() {
 
   useEffect(() => {
     if (profileData?.avatar && profileData.avatar[0]) {
-      const file = profileData.avatar[0];
-      setPreview(URL.createObjectURL(file));
+      const fileOrUrl = profileData.avatar[0];
+      if (typeof fileOrUrl === "string") {
+        setPreview(fileOrUrl);
+      } else {
+        setPreview(URL.createObjectURL(fileOrUrl));
+      }
     }
   }, [profileData?.avatar]);
 
@@ -43,7 +47,7 @@ export default function MobilePhone() {
       <div className="absolute flex h-full min-w-[60%] max-w-40 flex-col items-center gap-10 pt-[70px]">
         <div className="flex flex-col items-center gap-5">
           <Image
-            src={preview}
+            src={preview ?? profile}
             alt="profile"
             width={100}
             height={100}
