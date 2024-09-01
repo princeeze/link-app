@@ -89,6 +89,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="email"
                     placeholder="e.g. alex@email.com"
                     className={cn(
                       "pl-11 pr-4",
@@ -122,6 +123,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="new-password"
                     placeholder="At least 6 characters"
                     type="password"
                     className={cn(
@@ -157,6 +159,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="new-password"
                     placeholder="At least 6 characters"
                     type="password"
                     className={cn(

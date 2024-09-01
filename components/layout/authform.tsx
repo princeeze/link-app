@@ -20,7 +20,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import { loginSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 
@@ -81,6 +80,7 @@ export default function AuthForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="email"
                     placeholder="e.g. alex@email.com"
                     className={cn(
                       "pl-11 pr-4",
@@ -114,6 +114,7 @@ export default function AuthForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="current-password"
                     placeholder="Enter your password"
                     type="password"
                     className={cn(
