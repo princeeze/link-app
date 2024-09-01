@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
+
 import "./globals.css";
+
 import NextTopLoader from "nextjs-toploader";
+
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Instrument_Sans({ subsets: ["latin"] });
 
@@ -20,6 +24,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <NextTopLoader color="#633CFF" showSpinner={false} />
         {children}
+        <Toaster />
       </body>
     </html>
   );
