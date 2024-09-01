@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans } from "next/font/google";
 
+// eslint-disable-next-line no-restricted-imports
 import "./globals.css";
 
 import NextTopLoader from "nextjs-toploader";

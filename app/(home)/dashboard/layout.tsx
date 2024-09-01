@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import MobilePhone from "@/components/layout/mobilephone";
 import Navbar from "@/components/layout/navbar";
 

@@ -9,7 +9,6 @@
     "unicorn/no-keyword-prefix": "off",
     "unicorn/no-null": "off",
     "unicorn/no-negated-condition": "off",
-    "unicorn/prefer-spread": "off",
     "no-restricted-imports": [
       "warn",
       {
