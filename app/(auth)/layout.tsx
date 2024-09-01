@@ -1,6 +1,7 @@
 import Image from "next/image";
-import logo from "@/public/logo.svg";
 import Link from "next/link";
+
+import logo from "@/public/logo.svg";
 
 export default function AuthLayout({
   children,
@@ -8,12 +9,12 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main>
-      <div className="bg-grey-light flex flex-col gap-[51px] items-center w-screen p-6 justify-center">
+    <main className="h-screen bg-grey-light">
+      <div className="flex w-full flex-col items-center justify-center gap-[51px] p-6">
         <Link href="/">
-          <Image src={logo} alt="logo" />
+          <Image src={logo} alt="logo" priority={true} />
         </Link>
-        <div className="flex flex-col p-10 rounded-xl bg-white gap-10">
+        <div className="flex flex-col gap-10 rounded-xl bg-white p-10">
           {children}
         </div>
       </div>
