@@ -3,6 +3,8 @@ import { create } from "zustand";
 
 import { formSchema } from "@/lib/schema";
 
+// TODO: Fix Types and Validation
+
 interface FormDataState {
   formData: z.infer<typeof formSchema>["links"];
   profileData: {

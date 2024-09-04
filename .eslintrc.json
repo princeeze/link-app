@@ -1,11 +1,14 @@
 {
-  "extends": ["next/core-web-vitals", "plugin:unicorn/all"],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:unicorn/all",
+    "plugin:storybook/recommended"
+  ],
   "rules": {
     "unicorn/prevent-abbreviations": "off",
     "unicorn/no-keyword-prefix": "off",
     "unicorn/no-null": "off",
     "unicorn/no-negated-condition": "off",
-    "unicorn/prefer-spread": "off",
     "no-restricted-imports": [
       "warn",
       {
@@ -14,7 +17,11 @@
     ],
     "no-unused-vars": [
       "warn",
-      { "vars": "all", "args": "after-used", "ignoreRestSiblings": true }
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true
+      }
     ]
   }
 }

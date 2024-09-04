@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 
 import { login, signup } from "@/app/(auth)/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EnvelopeSimple, LockKey, Spinner } from "@phosphor-icons/react";
+import {
+  Confetti,
+  EnvelopeSimple,
+  LockKey,
+  Spinner,
+} from "@phosphor-icons/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { loginSchema, signupSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function SignupForm() {
   const form = useForm<z.infer<typeof signupSchema>>({
@@ -43,9 +49,15 @@ export default function SignupForm() {
 
     if (result.error) {
       setErrorMessage(result.error);
+      setIsLoading(false);
     } else {
-      result.message ? setErrorMessage(result.message) : "";
-
+      /* result.message ? setErrorMessage(result.message) : ""; */
+      toast({
+        icon: (
+          <Confetti weight="fill" size={20} className="text-grey-default" />
+        ),
+        title: "Signup successful!",
+      });
       // Login
       const loginValues: z.infer<typeof loginSchema> = {
         email: values.email,
@@ -54,13 +66,18 @@ export default function SignupForm() {
       const loginResult = await login(loginValues);
       if (loginResult.error) {
         setErrorMessage(loginResult.error);
+        setIsLoading(false);
       } else {
         setErrorMessage(null);
+        toast({
+          icon: (
+            <Confetti weight="fill" size={20} className="text-grey-default" />
+          ),
+          title: "Welcome!",
+        });
         router.push("/dashboard/links");
       }
     }
-
-    setIsLoading(false);
   }
 
   const handleInputChange = () => {
@@ -89,6 +106,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="email"
                     placeholder="e.g. alex@email.com"
                     className={cn(
                       "pl-11 pr-4",
@@ -122,6 +140,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="new-password"
                     placeholder="At least 6 characters"
                     type="password"
                     className={cn(
@@ -157,6 +176,7 @@ export default function SignupForm() {
                 />
                 <FormControl>
                   <Input
+                    autoComplete="new-password"
                     placeholder="At least 6 characters"
                     type="password"
                     className={cn(

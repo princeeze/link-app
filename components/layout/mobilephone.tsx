@@ -48,7 +48,7 @@ export default function MobilePhone() {
         <div className="flex flex-col items-center gap-5">
           <Image
             src={preview ?? profile}
-            alt="profile"
+            alt="User Avatar"
             width={100}
             height={100}
             className="h-16 w-16 rounded-full object-cover outline outline-4 outline-purple-default"

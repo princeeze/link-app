@@ -10,14 +10,14 @@ const words = ["professional", "career", "personal", "creative", "business"];
 
 export default function Home() {
   return (
-    <div className="dark:bg-dot-white/[0.2] bg-dot-black/[0.2] relative mx-auto flex h-screen max-w-screen-xl items-center justify-center bg-white px-4 dark:bg-[#000000] md:px-10">
-      <div className="dark:bg-black pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
-      <div className="text-transparent from-neutral-200 to-neutral-500 relative z-20 w-full space-y-10 bg-gradient-to-b bg-clip-text">
+    <div className="relative mx-auto flex h-screen max-w-screen-xl items-center justify-center bg-white px-4 bg-dot-black/[0.2] dark:bg-[#000000] dark:bg-dot-white/[0.2] md:px-10">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
+      <div className="relative z-20 w-full space-y-10 bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text text-transparent">
         <Image src={logo} alt="logo" className="w-36" />
         <h1 className="heading-m text-4xl font-medium text-grey-dark lg:text-5xl">
           Showcase your{" "}
           <FlipWords
-            className="text-gray-600 -ml-2 block py-3 sm:inline sm:py-0"
+            className="-ml-2 block py-3 text-gray-600 sm:inline sm:py-0"
             words={words}
           />
           <br className="hidden sm:inline" /> links with style.

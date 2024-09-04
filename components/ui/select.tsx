@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -19,8 +20,8 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex w-full justify-between items-center text-grey-dark rounded-lg border border-borders bg-white body-m py-3 ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed data-[state=open]:border-purple-default data-[state=open]:shadow-[0px_0px_32px_0px_#633CFF40] hover:shadow-[0px_0px_32px_0px_#633CFF40] hover:border-purple-default disabled:opacity-50 [&>span]:line-clamp-1 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300",
-      className
+      "body-m flex w-full items-center justify-between rounded-lg border border-borders bg-white py-3 text-grey-dark ring-offset-white placeholder:text-slate-500 hover:border-purple-default hover:shadow-[0px_0px_32px_0px_#633CFF40] focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-purple-default data-[state=open]:shadow-[0px_0px_32px_0px_#633CFF40] dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300 [&>span]:line-clamp-1",
+      className,
     )}
     {...props}
   >
@@ -40,7 +41,7 @@ const SelectScrollUpButton = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-default items-center justify-center py-1",
-      className
+      className,
     )}
     {...props}
   >
@@ -57,7 +58,7 @@ const SelectScrollDownButton = React.forwardRef<
     ref={ref}
     className={cn(
       "flex cursor-default items-center justify-center py-1",
-      className
+      className,
     )}
     {...props}
   >
@@ -75,10 +76,10 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative p-0 z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-lg border border-borders bg-white text-grey-dark shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50",
+        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-lg border border-borders bg-white p-0 text-grey-dark shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-        className
+        className,
       )}
       position={position}
       {...props}
@@ -88,7 +89,7 @@ const SelectContent = React.forwardRef<
         className={cn(
           "p-1",
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
         )}
       >
         {children}
@@ -118,8 +119,8 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full flex-row cursor-default select-none items-center py-3.5 px-4 body-m outline-none focus:bg-slate-100 focus:text-slate-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50 hover:bg-grey-light hover:rounded-lg  data-[state=checked]:text-purple-default",
-      className
+      "body-m relative flex w-full cursor-default select-none flex-row items-center px-4 py-3.5 outline-none hover:rounded-lg hover:bg-grey-light focus:bg-slate-100 focus:text-slate-900 data-[disabled]:pointer-events-none data-[state=checked]:text-purple-default data-[disabled]:opacity-50 dark:focus:bg-slate-800 dark:focus:text-slate-50",
+      className,
     )}
     {...props}
   >
