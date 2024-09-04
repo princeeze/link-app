@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 
 import { login } from "@/app/(auth)/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EnvelopeSimple, LockKey, Spinner } from "@phosphor-icons/react";
+import {
+  Confetti,
+  EnvelopeSimple,
+  LockKey,
+  Spinner,
+} from "@phosphor-icons/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -22,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { loginSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function AuthForm() {
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -34,9 +40,9 @@ export default function AuthForm() {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = React.useState<string | null>(
+  /* const [successMessage, setSuccessMessage] = React.useState<string | null>(
     null,
-  );
+  ); */
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
@@ -46,11 +52,17 @@ export default function AuthForm() {
       setErrorMessage(result.error);
       setIsLoading(false);
     } else {
-      setSuccessMessage(result.message || null);
+      // setSuccessMessage(result.message || null);
+      toast({
+        icon: (
+          <Confetti weight="fill" size={20} className="text-grey-default" />
+        ),
+        title: "Welcome back!",
+      });
       setTimeout(() => {
         router.push("/dashboard/links");
       }, 100); // Small delay to ensure session is fully updated
-      successMessage ? setIsLoading(true) : setIsLoading(false);
+      // successMessage ? setIsLoading(true) : setIsLoading(false);
     }
   }
 
@@ -137,7 +149,7 @@ export default function AuthForm() {
           )}
         />
         <FormDescription>
-          {successMessage && <span>{successMessage}</span>}
+          {/* {successMessage && <span>{successMessage}</span>} */}
         </FormDescription>
         <FormItem>
           <FormControl>
