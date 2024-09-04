@@ -9,7 +9,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="h-screen bg-grey-light">
+    <main className="flex h-screen items-center bg-grey-light">
       <div className="flex w-full flex-col items-center justify-center gap-[51px] p-6">
         <Link href="/">
           <Image src={logo} alt="logo" priority={true} />

@@ -14,7 +14,7 @@ export default function SignUp() {
       <SignupForm />
       <p className="body-m m-auto text-grey-default">
         Already have an account?{" "}
-        <Link href={"/Login"} className="text-purple-default">
+        <Link href={"/login"} className="text-purple-default">
           Login
         </Link>
       </p>
