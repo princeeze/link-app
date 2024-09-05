@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Link App
+
+A simple app to store and share your links.
+
+## Features
+
+- **User Authentication**: Secure login and registration.
+- **Store Links**: Save and manage your favorite links.
+- **Edit Links**: Update your stored links easily.
+- **Share Links**: Share links directly from the app.
+- **Delete Links**: Remove links when no longer needed.
+- **Responsive Design**: Works seamlessly on all device sizes.
+
+## Roadmap
+
+- [x] Add user authentication
+- [x] Add link storage
+- [x] Add link editing
+- [x] Add link deletion
+- [ ] Add link sharing
+- [ ] Add link dragging
+- [ ] Fix platform fetch error
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, Tailwind CSS, Typescript
+- **Backend**: Supabase
+- **Icons**: Phosphor Icons
+- **UI Components**: ShadcnUI, AcceternityUI
+- **Package Manager**: pnpm
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to get the project up and running on your local machine.
+
+### Prerequisites
+
+- **Node.js**: Make sure Node.js is installed. [Download here](https://nodejs.org/).
+- **pnpm**: Install pnpm if you haven't already:
+
+  ```bash
+  npm install -g pnpm
+  ```
+
+### Cloning the Repository
+
+1. Clone the repository to your local machine:
+
+   ```bash
+   git clone https://github.com/princeeze/link-app.git
+   ```
+
+2. Navigate to the project directory:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd link-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Setting Up Supabase
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Create a new project on [Supabase](https://supabase.com/).
+2. Grab your API keys from the Supabase dashboard.
+3. Copy the `.env` file in the root directory of your project to a `.env.local` file and add the environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Run the Project
 
-## Learn More
+```bash
+pnpm i
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This project is licensed under the MIT License
