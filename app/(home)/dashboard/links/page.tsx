@@ -2,7 +2,7 @@ import LinkForm from "@/components/layout/linkform";
 
 export default function Links() {
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex w-full flex-col gap-10">
       <div>
         <h1 className="heading-m pb-2 text-grey-dark">Customize your links</h1>
         <p className="body-m text-grey-default">

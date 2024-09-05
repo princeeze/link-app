@@ -53,7 +53,13 @@ const Card = ({ variant, link }: CardProps) => {
       {cardContent}
     </a>
   ) : (
-    <div className="w-full cursor-not-allowed opacity-50">{cardContent}</div>
+    <div
+      className={cn("w-full cursor-not-allowed opacity-50", {
+        "opacity-100": variant == undefined,
+      })}
+    >
+      {cardContent}
+    </div>
   );
 };
 
