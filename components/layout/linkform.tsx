@@ -33,7 +33,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-
 import { formSchema } from "@/lib/schema";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -60,6 +59,7 @@ export default function LinkForm() {
     },
   });
 
+  const { isDirty } = form.formState;
   const { fields, append, remove } = useFieldArray({
     name: "links",
     control: form.control,
@@ -102,6 +102,28 @@ export default function LinkForm() {
     }
     setIsLoading(false);
   };
+
+  // Prevent user from leaving page without saving
+  //
+  // ------ 1. Listen for browser window/tab close
+  useEffect(() => {
+    const handleWindowBeforeUnload = (e: { returnValue: string }) => {
+      if (isDirty) {
+        const message =
+          "You have unsaved changes. Are you sure you want to leave?";
+        e.returnValue = message;
+        return message;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleWindowBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowBeforeUnload);
+    };
+  }, [isDirty]);
+
+  // ------ 2. Listen for route change
 
   const allLinks = (
     <Form {...form}>
