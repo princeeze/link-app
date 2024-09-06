@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import { getLinks, updateLinks } from "@/app/(home)/dashboard/links/links";
+import noLinks from "@/public/no-links.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Spinner } from "@phosphor-icons/react";
 import {
+  FloppyDiskBack,
   GithubLogo,
   LinkedinLogo,
+  SmileyMelting,
+  Spinner,
   YoutubeLogo,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@phosphor-icons/react";
 import { LucideLink } from "lucide-react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -25,6 +29,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import {
   Select,
   SelectContent,
@@ -36,13 +41,33 @@ import { Separator } from "@/components/ui/separator";
 import { formSchema } from "@/lib/schema";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function LinkForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [linksLoading, setLinksLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("github");
+  const loadingStates = [
+    {
+      text: "Grabbing your links",
+    },
+    {
+      text: "Sliding through socials",
+    },
+    {
+      text: "Connecting the dots",
+    },
+    {
+      text: "Prepping the link drop",
+    },
+    {
+      text: "Almost there, fam",
+    },
+    {
+      text: "Oops, starting over! 🤷‍♂️",
+    },
+  ];
 
   //placeholders for input
   const placeholders: Record<string, string> = {
@@ -58,7 +83,6 @@ export default function LinkForm() {
       links: [],
     },
   });
-
   const { isDirty } = form.formState;
   const { fields, append, remove } = useFieldArray({
     name: "links",
@@ -79,6 +103,7 @@ export default function LinkForm() {
     async function fetchLinks() {
       const result = await getLinks();
       if (Array.isArray(result)) {
+        console.log(result);
         form.reset({ links: result });
         setLinksLoading(false);
       } else {
@@ -93,12 +118,20 @@ export default function LinkForm() {
   const onSubmit = async () => {
     setIsLoading(true);
     setErrorMessage(null);
-    console.log(formData);
     const result = await updateLinks(formData);
     if (result.error) {
       setErrorMessage(result.error);
     } else {
-      setSuccessMessage("Beautifully updated!");
+      toast({
+        icon: (
+          <FloppyDiskBack
+            weight="fill"
+            size={15}
+            className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
+          />
+        ),
+        title: "Your changes have been successfully saved!",
+      });
     }
     setIsLoading(false);
   };
@@ -257,14 +290,44 @@ export default function LinkForm() {
           </div>
         ))}
 
-        <FormItem>
+        {fields.length === 0 && (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-grey-light p-10">
+            <Image src={noLinks} alt="No links found" />
+            <p className="heading-m text-center text-2xl text-grey-dark">
+              Let&apos;s get you started
+            </p>
+            <p className="body-m text-center text-grey-default">
+              Use the “Add new link” button to get started. Once you have more
+              than one link, you can reorder and edit them. We&apos;re here to
+              help you share your profiles with everyone!
+            </p>
+          </div>
+        )}
+
+        <Separator />
+
+        <FormItem className="flex w-full items-center">
           <FormMessage />
           <FormDescription>
-            {successMessage && <span>{successMessage}</span>}
             {errorMessage && <span className="text-red">{errorMessage}</span>}
           </FormDescription>
-          <FormControl>
-            <Button disabled={isLoading}>
+          <FormControl
+            onClick={() => {
+              if (formData.length === 0) {
+                toast({
+                  icon: (
+                    <SmileyMelting
+                      weight="fill"
+                      size={20}
+                      className="text-grey-default"
+                    />
+                  ),
+                  title: "No links found",
+                });
+              }
+            }}
+          >
+            <Button disabled={isLoading} className="ml-auto">
               {isLoading && (
                 <Spinner
                   weight="bold"
@@ -281,8 +344,12 @@ export default function LinkForm() {
   );
 
   return linksLoading ? (
-    <div className="flex h-full w-full items-center justify-center">
-      Loading...
+    <div className="flex h-full w-full">
+      <MultiStepLoader
+        loadingStates={loadingStates}
+        loading={true}
+        duration={2000}
+      />
     </div>
   ) : (
     <>{allLinks}</>
