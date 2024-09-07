@@ -1,9 +1,5 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:unicorn/all",
-    "plugin:storybook/recommended"
-  ],
+  "extends": ["next/core-web-vitals", "plugin:unicorn/all"],
   "rules": {
     "unicorn/prevent-abbreviations": "off",
     "unicorn/no-keyword-prefix": "off",
