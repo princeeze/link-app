@@ -245,6 +245,7 @@ export default function ProfileForm() {
     if (debouncedUsername) {
       validateUsername(debouncedUsername);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedUsername]);
 
