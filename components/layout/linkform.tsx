@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import { getLinks, updateLinks } from "@/app/(home)/dashboard/links/links";
+import { getProfile } from "@/app/(home)/dashboard/profile/profile";
 import noLinks from "@/public/no-links.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -38,34 +39,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { formSchema } from "@/lib/schema";
+import { linkFormSchema } from "@/lib/schema";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
 export default function LinkForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [linksLoading, setLinksLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("github");
   const loadingStates = [
     {
-      text: "Grabbing your links",
+      text: "Connecting to Supabase",
     },
     {
-      text: "Sliding through socials",
+      text: "Searching for your profile",
     },
     {
-      text: "Connecting the dots",
+      text: "Found you",
     },
     {
-      text: "Prepping the link drop",
+      text: "Fetching your details",
     },
     {
-      text: "Almost there, fam",
+      text: "Locking down your links",
     },
     {
-      text: "Oops, starting over! 🤷‍♂️",
+      text: "Trying again 🤦‍♂️",
     },
   ];
 
@@ -77,8 +77,8 @@ export default function LinkForm() {
   };
 
   //define react hook form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof linkFormSchema>>({
+    resolver: zodResolver(linkFormSchema),
     defaultValues: {
       links: [],
     },
@@ -89,36 +89,76 @@ export default function LinkForm() {
     control: form.control,
   });
 
+  //fetch data from supabase
+  useEffect(() => {
+    if (fetchedData === false) {
+      getData();
+    } else {
+      form.reset({ links: linkStore });
+    }
+
+    async function getData() {
+      // fetch profile from supabase
+
+      const profileResult = await getProfile();
+      console.log("foolishresult", profileResult);
+      if (profileResult !== undefined) {
+        if (profileResult?.profile) {
+          const { profile, avatarData } = profileResult;
+          setProfileStore(profile);
+          ``;
+          setAvatar(avatarData.publicUrl);
+        }
+      } else {
+        toast({
+          title: `Couldn't fetch profile`,
+          icon: (
+            <SmileyMelting
+              weight="fill"
+              size={20}
+              className="text-grey-default"
+            />
+          ),
+        });
+      }
+      //fetch links from supabase
+      const linkResult = await getLinks();
+      if (Array.isArray(linkResult)) {
+        form.reset({ links: linkResult });
+      } else {
+        toast({
+          title: `Couldn't fetch links: ${linkResult.error}`,
+          icon: (
+            <SmileyMelting
+              weight="fill"
+              size={20}
+              className="text-grey-default"
+            />
+          ),
+        });
+      }
+
+      setFetchedData(true);
+    }
+  }, []);
+
   //setup zustand to watch for changes
-  const setFormData = useFormDataStore((state) => state.setFormData);
-  const formData = useFormDataStore((state) => state.formData);
+  const setLinkStore = useFormDataStore((state) => state.setLinkStore);
+  const linkStore = useFormDataStore((state) => state.linkStore);
+  const setProfileStore = useFormDataStore((state) => state.setProfileStore);
+  const setAvatar = useFormDataStore((state) => state.setAvatarURL);
+  const fetchedData = useFormDataStore((state) => state.fetchedData);
+  const setFetchedData = useFormDataStore((state) => state.setFetchedData);
   const watch = useWatch({ control: form.control, name: "links" });
   useEffect(() => {
-    setFormData(watch);
-  }, [watch, setFormData]);
-
-  //fetch links from supabase
-  useEffect(() => {
-    setLinksLoading(true);
-    async function fetchLinks() {
-      const result = await getLinks();
-      if (Array.isArray(result)) {
-        console.log(result);
-        form.reset({ links: result });
-        setLinksLoading(false);
-      } else {
-        console.error("Error fetching links:", result.error);
-        setLinksLoading(false);
-      }
-    }
-    fetchLinks();
-  }, [form]);
+    setLinkStore(watch);
+  }, [watch, setLinkStore]);
 
   //submit links to supabase
   const onSubmit = async () => {
     setIsLoading(true);
     setErrorMessage(null);
-    const result = await updateLinks(formData);
+    const result = await updateLinks(linkStore);
     if (result.error) {
       setErrorMessage(result.error);
     } else {
@@ -167,7 +207,15 @@ export default function LinkForm() {
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() => append({ platform: "github", link: "" })}
+          onClick={() => {
+            if (linkStore.length === 5) {
+              toast({
+                title: "You can only add up to 5 links",
+              });
+              return;
+            }
+            append({ platform: "github", link: "" });
+          }}
         >
           + Add New Link
         </Button>
@@ -313,7 +361,7 @@ export default function LinkForm() {
           </FormDescription>
           <FormControl
             onClick={() => {
-              if (formData.length === 0) {
+              if (linkStore.length === 0) {
                 toast({
                   icon: (
                     <SmileyMelting
@@ -343,7 +391,9 @@ export default function LinkForm() {
     </Form>
   );
 
-  return linksLoading ? (
+  return fetchedData ? (
+    <>{allLinks}</>
+  ) : (
     <div className="flex h-full w-full">
       <MultiStepLoader
         loadingStates={loadingStates}
@@ -351,7 +401,5 @@ export default function LinkForm() {
         duration={2000}
       />
     </div>
-  ) : (
-    <>{allLinks}</>
   );
 }

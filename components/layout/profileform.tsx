@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+import { getLinks } from "@/app/(home)/dashboard/links/links";
 import {
   checkUsernameAvailability,
   getProfile,
@@ -13,6 +14,7 @@ import {
   FloppyDiskBack,
   Image as ImageIcon,
   LinkBreak,
+  SmileyMelting,
   Spinner,
 } from "@phosphor-icons/react";
 import { useDebounce } from "@uidotdev/usehooks";
@@ -30,44 +32,41 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { Separator } from "@/components/ui/separator";
 import { profileFormSchema } from "@/lib/schema";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
 export default function ProfileForm() {
-  const [preview, setPreview] = useState<string | undefined>();
   const [validating, setValidating] = useState(false);
   const [validationResponse, setValidationResponse] = useState<string | null>(
     null,
   );
   const [formUser, setFormUser] = useState("");
-  const [profileLoading, setProfileLoading] = useState(true);
+  const loadingStates = [
+    {
+      text: "Connecting to Supabase",
+    },
+    {
+      text: "Searching for your profile",
+    },
+    {
+      text: "Found you",
+    },
+    {
+      text: "Fetching your details",
+    },
+    {
+      text: "Locking down your links",
+    },
+    {
+      text: "Trying again 🤦‍♂️",
+    },
+  ];
 
-  //get profile data
-  useEffect(() => {
-    const fetchProfile = async () => {
-      setProfileLoading(true);
-
-      const result = await getProfile();
-      if (result?.profile) {
-        const { profile, avatarData } = result;
-        form.reset({
-          name: profile.name,
-          username: profile.username,
-          email: profile.email,
-          avatar: avatarData,
-        });
-        setPreview(avatarData.publicUrl);
-      } else {
-        console.error("Failed to fetch profile data");
-      }
-      setProfileLoading(false);
-    };
-    fetchProfile();
-  }, []);
-
-  //define form
+  //define react hook form
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -76,13 +75,75 @@ export default function ProfileForm() {
       email: "",
     },
   });
+  const { isDirty } = form.formState;
   const [loading, setLoading] = useState(false);
+
+  //fetch data from supabase
+  useEffect(() => {
+    if (fetchedData === false) {
+      getData();
+    } else {
+      form.reset({
+        name: profileStore.name,
+        email: profileStore.email,
+        username: profileStore.username,
+      });
+      setTimeout(() => {
+        form.setValue("username", profileStore.username);
+      }, 0);
+    }
+
+    async function getData() {
+      // fetch profile from supabase
+
+      const profileResult = await getProfile();
+      if (profileResult?.profile) {
+        const { profile, avatarData } = profileResult;
+        form.reset({
+          name: profile.name,
+          username: profile.username,
+          email: profile.email,
+          // avatar: avatarData,
+        });
+        setAvatarURL(avatarData.publicUrl);
+      } else {
+        toast({
+          title: `Couldn't fetch profile`,
+          icon: (
+            <SmileyMelting
+              weight="fill"
+              size={20}
+              className="text-grey-default"
+            />
+          ),
+        });
+      }
+      //fetch links from supabase
+      const linkResult = await getLinks();
+      if (Array.isArray(linkResult)) {
+        setLinkStore(linkResult);
+      } else {
+        toast({
+          title: `Couldn't fetch links: ${linkResult.error}`,
+          icon: (
+            <SmileyMelting
+              weight="fill"
+              size={20}
+              className="text-grey-default"
+            />
+          ),
+        });
+      }
+
+      setFetchedData(true);
+    }
+  }, []);
 
   //onSubmit
   async function onSubmit(data: z.infer<typeof profileFormSchema>) {
     console.log("formData:", data);
-    console.log("avatar:", avatar);
-    console.log("store:", profileData);
+    console.log("avatar:", avatarURL);
+    console.log("store:", profileStore);
     const formText: z.infer<typeof profileFormSchema> = {
       name: data.name,
       username: data.username,
@@ -91,10 +152,24 @@ export default function ProfileForm() {
     setLoading(true);
     if (validationResponse?.endsWith("available")) {
       try {
+        let result: any = null;
         const formData = new FormData();
-        formData.append("file", data.avatar[0]);
-        console.log(formData, formText);
-        const result = await updateProfile(formData, formText);
+        if (
+          data.avatar &&
+          data.avatar.length > 0 &&
+          data.avatar[0] !== undefined
+        ) {
+          formData.append("file", data.avatar[0]);
+          console.log(formData, formText);
+          result = await updateProfile(formText, formData);
+        } else if (avatarURL) {
+          const formTextWithAvatar: z.infer<typeof profileFormSchema> = {
+            ...formText,
+            avatar: avatarURL.replace(/^.*\/avatars\//, ""),
+          };
+          result = await updateProfile(formTextWithAvatar);
+        }
+
         if (result) {
           toast({
             icon: (
@@ -120,26 +195,38 @@ export default function ProfileForm() {
       }
     } else {
       setLoading(false);
-      console.error("Username is not available");
+      toast({
+        icon: (
+          <LinkBreak weight="fill" size={20} className="text-grey-default" />
+        ),
+        title: `That username might not be available`,
+      });
     }
   }
 
   //setup zustand to watch for changes
-  const setProfileData = useFormDataStore((state) => state.setProfileData);
-  const setAvatar = useFormDataStore((state) => state.setAvatar);
-  const avatar = useFormDataStore((state) => state.avatar);
-  const profileData = useFormDataStore((state) => state.profileData);
+  const setProfileStore = useFormDataStore((state) => state.setProfileStore);
+  const setAvatarURL = useFormDataStore((state) => state.setAvatarURL);
+  const avatarURL = useFormDataStore((state) => state.avatarURL);
+  const fetchedData = useFormDataStore((state) => state.fetchedData);
+  const setFetchedData = useFormDataStore((state) => state.setFetchedData);
+  const setLinkStore = useFormDataStore((state) => state.setLinkStore);
+  const profileStore = useFormDataStore((state) => state.profileStore);
   const watch = useWatch({ control: form.control });
   useEffect(() => {
-    setProfileData(watch);
-  }, [watch, setProfileData]);
+    setProfileStore({
+      ...watch,
+      name: watch.name || "",
+      username: watch.username || "",
+      email: watch.email || "",
+    });
+  }, [watch, setProfileStore]);
 
   //handle file upload preview
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      setPreview(URL.createObjectURL(file));
-      setAvatar(preview);
+      setAvatarURL(URL.createObjectURL(file));
     }
   }
 
@@ -188,7 +275,29 @@ export default function ProfileForm() {
     }
   };
 
-  return (
+  // Prevent user from leaving page without saving
+  //
+  // ------ 1. Listen for browser window/tab close
+  useEffect(() => {
+    const handleWindowBeforeUnload = (e: { returnValue: string }) => {
+      if (isDirty) {
+        const message =
+          "You have unsaved changes. Are you sure you want to leave?";
+        e.returnValue = message;
+        return message;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleWindowBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowBeforeUnload);
+    };
+  }, [isDirty]);
+
+  // ------ 2. Listen for route change
+
+  const allProfile = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
@@ -214,10 +323,10 @@ export default function ProfileForm() {
                       />
                     </FormControl>
                   </div>
-                  {preview ? (
+                  {avatarURL ? (
                     <div className="relative h-full cursor-pointer">
                       <Image
-                        src={preview}
+                        src={avatarURL}
                         width={100}
                         height={100}
                         objectFit="cover"
@@ -346,11 +455,25 @@ export default function ProfileForm() {
             )}
           />
         </div>
-        <Button type="submit" disabled={loading}>
+
+        <Separator />
+
+        <Button type="submit" disabled={loading} className="ml-auto">
           {loading && <Spinner className="mr-2 animate-spin" size={16} />}
           Save
         </Button>
       </form>
     </Form>
+  );
+  return fetchedData ? (
+    <>{allProfile}</>
+  ) : (
+    <div className="flex h-full w-full">
+      <MultiStepLoader
+        loadingStates={loadingStates}
+        loading={true}
+        duration={2000}
+      />
+    </div>
   );
 }

@@ -38,7 +38,7 @@ export const linkSchema = z.object({
     }, "Invalid link for the selected platform"),
 });
 
-export const formSchema = z.object({
+export const linkFormSchema = z.object({
   links: z.array(linkSchema).min(1, "At least one link is required"),
 });
 
@@ -48,13 +48,17 @@ export const profileFormSchema = z.object({
   email: z.string().min(1, "Required").email("Invalid address"),
   avatar: z
     .any()
-    .refine((files) => files?.length === 1, "Profile picture is required")
-    .refine(
-      (files) => files?.[0]?.size <= 1024 * 1024,
-      "Image must be less than 1MB",
-    )
-    .refine(
-      (files) => ["image/jpeg", "image/png"].includes(files?.[0]?.type),
-      "Only PNG or JPG formats are allowed",
-    ),
+    // .refine((files) => files?.length === 1, "Profile picture is required")
+    .refine((files) => {
+      if (!files || files.length === 0 || files[0].size === 0) {
+        return true; // Allow empty file input
+      }
+      return files[0].size <= 1024 * 1024;
+    }, "Image must be less than 1MB")
+    .refine((files) => {
+      if (!files || files.length === 0 || files[0].size === 0) {
+        return true; // Allow empty file input
+      }
+      return ["image/jpeg", "image/png"].includes(files?.[0]?.type);
+    }, "Only PNG or JPG formats are allowed"),
 });

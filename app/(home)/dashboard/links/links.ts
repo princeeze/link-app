@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { createClient } from "@/utils/supabase/server";
-import { formSchema, linkSchema } from "@/lib/schema";
+import { linkFormSchema, linkSchema } from "@/lib/schema";
 
 export async function getLinks() {
   const supabase = createClient();
@@ -36,7 +36,7 @@ export async function getLinks() {
 }
 
 export async function updateLinks(
-  newLinks: z.infer<typeof formSchema>["links"],
+  newLinks: z.infer<typeof linkFormSchema>["links"],
 ) {
   const supabase = createClient();
   try {

@@ -6,8 +6,8 @@ import { createClient } from "@/utils/supabase/server";
 import { profileFormSchema } from "@/lib/schema";
 
 export async function updateProfile(
-  formData: FormData,
   formText: z.infer<typeof profileFormSchema>,
+  formData?: FormData,
 ) {
   const supabase = createClient();
 
@@ -27,51 +27,59 @@ export async function updateProfile(
       throw new Error("User is not authenticated");
     }
 
+    let filePath: string | undefined;
+
     // Get file from form data
-    const file = formData.get("file") as File;
+    if (formData) {
+      const file = formData.get("file") as File;
 
-    if (!file) {
-      throw new Error("No file uploaded");
+      if (!file) {
+        throw new Error("No file uploaded");
+      }
+
+      // Define file path
+      const userId = user.id;
+      filePath = `${userId}_${file.name}`;
+
+      // Upload file to Supabase
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, {
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("File upload error:", uploadError);
+        throw new Error("Failed to upload file");
+      }
     }
 
-    // Define file path
-    const userId = user.id;
-    const filePath = `${userId}_${file.name}`;
-
-    // Upload file to Supabase
-    const { data, error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(filePath, file, {
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error("File upload error:", uploadError);
-      throw new Error("Failed to upload file");
-    }
+    // Prepare profile update data
+    const profileUpdate = {
+      user_id: user.id,
+      name: formText.name,
+      username: formText.username,
+      email: formText.email,
+      ...(filePath ? { avatar: filePath } : { avatar: formText.avatar }), // Only include avatar if filePath is defined
+    };
 
     // Update profile in Supabase
-    const { error: updateError } = await supabase.from("profile").upsert(
-      {
-        user_id: userId,
-        name: formText.name,
-        username: formText.username,
-        email: formText.email,
-        avatar: filePath,
-      },
-      {
+    const { error: updateError } = await supabase
+      .from("profile")
+      .upsert(profileUpdate, {
         onConflict: "user_id",
-      },
-    );
+      });
 
     if (updateError) {
+      console.log("Profile update error:", updateError);
       throw new Error("Failed to update profile");
     }
 
-    console.log("File uploaded successfully:", data);
-    return data; // Return the data for further processing
+    // Return success message
+    return { success: true };
+    console.log("Profile updated successfully");
   } catch (error: Error | any) {
-    console.error("Error during file upload:", error.message);
+    console.error("Error during profile update:", error.message);
     throw error; // Re-throw the error to be handled by the caller
   }
 }

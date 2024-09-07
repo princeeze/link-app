@@ -1,27 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import Card from "@/components/ui/card";
 import { useFormDataStore } from "@/lib/store";
 
 export default function MobilePhone() {
-  const formData = useFormDataStore((state) => state.formData);
-  const profileData = useFormDataStore((state) => state.profileData);
-
-  const [preview, setPreview] = useState<string | undefined>();
-
-  useEffect(() => {
-    if (profileData?.avatar && profileData.avatar[0]) {
-      const fileOrUrl = profileData.avatar[0];
-      if (typeof fileOrUrl === "string") {
-        setPreview(fileOrUrl);
-      } else {
-        setPreview(URL.createObjectURL(fileOrUrl));
-      }
-    }
-  }, [profileData?.avatar]);
+  const linkStore = useFormDataStore((state) => state.linkStore);
+  const profileStore = useFormDataStore((state) => state.profileStore);
+  const avatarURL = useFormDataStore((state) => state.avatarURL);
 
   return (
     <div className="col-span-4 hidden bg-white py-4 lg:inline">
@@ -46,9 +33,9 @@ export default function MobilePhone() {
         </div>
         <div className="absolute flex h-full w-[320px] flex-col items-center gap-8 px-8 pt-[9vh]">
           <div className="flex flex-col items-center gap-4">
-            {preview ? (
+            {avatarURL ? (
               <Image
-                src={preview}
+                src={avatarURL}
                 alt="User Avatar"
                 width={100}
                 height={100}
@@ -58,16 +45,16 @@ export default function MobilePhone() {
               <div className="h-20 w-20 rounded-full bg-[#EEEEEE]"></div>
             )}
             <div className="flex flex-col items-center gap-1">
-              {profileData?.name ? (
+              {profileStore.name ? (
                 <span className="body-m text-[18px] font-semibold text-grey-dark">
-                  {profileData.name}
+                  {profileStore.name}
                 </span>
               ) : (
                 <div className="h-3 w-32 rounded-full bg-[#EEEEEE]"></div>
               )}
-              {profileData?.email ? (
+              {profileStore.email ? (
                 <span className="body-s text-grey-default">
-                  {profileData.email}
+                  {profileStore.email}
                 </span>
               ) : (
                 <div className="mt-[1vh] h-1.5 w-20 rounded-full bg-[#EEEEEE]"></div>
@@ -75,7 +62,7 @@ export default function MobilePhone() {
             </div>
           </div>
           <div className="flex w-[30vh] flex-col gap-4">
-            {formData.map((item: any) => {
+            {linkStore.map((item: any) => {
               return (
                 <Card
                   variant={item.platform}
@@ -84,7 +71,7 @@ export default function MobilePhone() {
                 />
               );
             })}
-            {Array.from({ length: 5 - formData.length }).map((_, i) => (
+            {Array.from({ length: 5 - linkStore.length }).map((_, i) => (
               <Card key={i} variant={undefined} link={undefined} />
             ))}
           </div>
