@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import { getLinks, updateLinks } from "@/app/(home)/dashboard/links/links";
+import { getProfile } from "@/app/(home)/dashboard/profile/profile";
+import noLinks from "@/public/no-links.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Spinner } from "@phosphor-icons/react";
 import {
+  FloppyDiskBack,
   GithubLogo,
   LinkedinLogo,
+  SmileyMelting,
+  Spinner,
   YoutubeLogo,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@phosphor-icons/react";
 import { LucideLink } from "lucide-react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -25,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import {
   Select,
   SelectContent,
@@ -33,17 +39,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-
-import { formSchema } from "@/lib/schema";
+import { linkFormSchema } from "@/lib/schema";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function LinkForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [linksLoading, setLinksLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("github");
+  const loadingStates = [
+    {
+      text: "Connecting to Supabase",
+    },
+    {
+      text: "Searching for your profile",
+    },
+    {
+      text: "Found you",
+    },
+    {
+      text: "Fetching your details",
+    },
+    {
+      text: "Locking down your links",
+    },
+    {
+      text: "Trying again 🤦‍♂️",
+    },
+  ];
 
   //placeholders for input
   const placeholders: Record<string, string> = {
@@ -53,55 +77,118 @@ export default function LinkForm() {
   };
 
   //define react hook form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof linkFormSchema>>({
+    resolver: zodResolver(linkFormSchema),
     defaultValues: {
       links: [],
     },
   });
-
+  const { isDirty } = form.formState;
   const { fields, append, remove } = useFieldArray({
     name: "links",
     control: form.control,
   });
 
+  //fetch data from supabase
+  useEffect(() => {
+    if (fetchedData === false) {
+      getData();
+    } else {
+      form.reset({ links: linkStore });
+    }
+
+    async function getData() {
+      // fetch profile from supabase
+
+      const profileResult = await getProfile();
+      if (profileResult?.profile && profileResult.profile.length > 0) {
+        const firstProfile = profileResult.profile[0];
+        setProfileStore({
+          name: firstProfile.name,
+          username: firstProfile.username,
+          email: firstProfile.email,
+          // avatar: firstProfile.avatar,
+        });
+        if (firstProfile.avatar) {
+          setAvatarURL(profileResult.avatarData?.publicUrl);
+        }
+      }
+      //fetch links from supabase
+      const linkResult = await getLinks();
+      if (Array.isArray(linkResult)) {
+        form.reset({ links: linkResult });
+      } else {
+        toast({
+          title: `Couldn't fetch links: ${linkResult.error}`,
+          icon: (
+            <SmileyMelting
+              weight="fill"
+              size={20}
+              className="text-grey-default"
+            />
+          ),
+        });
+      }
+
+      setFetchedData(true);
+    }
+  }, []);
+
   //setup zustand to watch for changes
-  const setFormData = useFormDataStore((state) => state.setFormData);
-  const formData = useFormDataStore((state) => state.formData);
+  const setLinkStore = useFormDataStore((state) => state.setLinkStore);
+  const linkStore = useFormDataStore((state) => state.linkStore);
+  const setProfileStore = useFormDataStore((state) => state.setProfileStore);
+  const setAvatarURL = useFormDataStore((state) => state.setAvatarURL);
+  const fetchedData = useFormDataStore((state) => state.fetchedData);
+  const setFetchedData = useFormDataStore((state) => state.setFetchedData);
   const watch = useWatch({ control: form.control, name: "links" });
   useEffect(() => {
-    setFormData(watch);
-  }, [watch, setFormData]);
-
-  //fetch links from supabase
-  useEffect(() => {
-    setLinksLoading(true);
-    async function fetchLinks() {
-      const result = await getLinks();
-      if (Array.isArray(result)) {
-        form.reset({ links: result });
-        setLinksLoading(false);
-      } else {
-        console.error("Error fetching links:", result.error);
-        setLinksLoading(false);
-      }
-    }
-    fetchLinks();
-  }, [form]);
+    setLinkStore(watch);
+  }, [watch, setLinkStore]);
 
   //submit links to supabase
   const onSubmit = async () => {
     setIsLoading(true);
     setErrorMessage(null);
-    console.log(formData);
-    const result = await updateLinks(formData);
+    const result = await updateLinks(linkStore);
     if (result.error) {
       setErrorMessage(result.error);
     } else {
-      setSuccessMessage("Beautifully updated!");
+      toast({
+        icon: (
+          <FloppyDiskBack
+            weight="fill"
+            size={15}
+            className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
+          />
+        ),
+        title: "Your changes have been successfully saved!",
+      });
     }
     setIsLoading(false);
   };
+
+  // Prevent user from leaving page without saving
+  //
+  // ------ 1. Listen for browser window/tab close
+  useEffect(() => {
+    const handleWindowBeforeUnload = (e: { returnValue: string }) => {
+      if (isDirty) {
+        const message =
+          "You have unsaved changes. Are you sure you want to leave?";
+        e.returnValue = message;
+        return message;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleWindowBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowBeforeUnload);
+    };
+  }, [isDirty]);
+
+  // ------ 2. Listen for route change
 
   const allLinks = (
     <Form {...form}>
@@ -112,13 +199,21 @@ export default function LinkForm() {
         <Button
           variant="secondary"
           className="w-full"
-          onClick={() => append({ platform: "github", link: "" })}
+          onClick={() => {
+            if (linkStore.length === 5) {
+              toast({
+                title: "You can only add up to 5 links",
+              });
+              return;
+            }
+            append({ platform: "github", link: "" });
+          }}
         >
           + Add New Link
         </Button>
         {fields.map((field, index) => (
           <div
-            key={field.id}
+            key={`${field.id}-${Math.random().toString(36).slice(7)}`}
             className="flex w-full flex-col gap-3 rounded-xl bg-grey-light p-5"
           >
             <div className="flex w-full items-center justify-between">
@@ -235,14 +330,44 @@ export default function LinkForm() {
           </div>
         ))}
 
-        <FormItem>
+        {fields.length === 0 && (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-grey-light p-10">
+            <Image src={noLinks} alt="No links found" />
+            <p className="heading-m text-center text-2xl text-grey-dark">
+              Let&apos;s get you started
+            </p>
+            <p className="body-m text-center text-grey-default">
+              Use the “Add new link” button to get started. Once you have more
+              than one link, you can reorder and edit them. We&apos;re here to
+              help you share your profiles with everyone!
+            </p>
+          </div>
+        )}
+
+        <Separator />
+
+        <FormItem className="flex w-full items-center">
           <FormMessage />
           <FormDescription>
-            {successMessage && <span>{successMessage}</span>}
             {errorMessage && <span className="text-red">{errorMessage}</span>}
           </FormDescription>
-          <FormControl>
-            <Button disabled={isLoading}>
+          <FormControl
+            onClick={() => {
+              if (linkStore.length === 0) {
+                toast({
+                  icon: (
+                    <SmileyMelting
+                      weight="fill"
+                      size={20}
+                      className="text-grey-default"
+                    />
+                  ),
+                  title: "No links found",
+                });
+              }
+            }}
+          >
+            <Button disabled={isLoading} className="ml-auto">
               {isLoading && (
                 <Spinner
                   weight="bold"
@@ -258,11 +383,15 @@ export default function LinkForm() {
     </Form>
   );
 
-  return linksLoading ? (
-    <div className="flex h-full w-full items-center justify-center">
-      Loading...
-    </div>
-  ) : (
+  return fetchedData ? (
     <>{allLinks}</>
+  ) : (
+    <div className="flex h-full w-full">
+      <MultiStepLoader
+        loadingStates={loadingStates}
+        loading={true}
+        duration={2000}
+      />
+    </div>
   );
 }

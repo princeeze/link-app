@@ -3,12 +3,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+import { getLinks } from "@/app/(home)/dashboard/links/links";
 import {
   checkUsernameAvailability,
-  uploadFile,
+  getProfile,
+  updateProfile,
 } from "@/app/(home)/dashboard/profile/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Spinner } from "@phosphor-icons/react";
+import {
+  FloppyDiskBack,
+  Image as ImageIcon,
+  LinkBreak,
+  SmileyMelting,
+  Spinner,
+} from "@phosphor-icons/react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -24,27 +32,110 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiStepLoader } from "@/components/ui/multi-step-loader";
+import { Separator } from "@/components/ui/separator";
 import { profileFormSchema } from "@/lib/schema";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function ProfileForm() {
-  const [preview, setPreview] = useState<string | undefined>();
   const [validating, setValidating] = useState(false);
   const [validationResponse, setValidationResponse] = useState<string | null>(
     null,
   );
   const [formUser, setFormUser] = useState("");
+  const loadingStates = [
+    {
+      text: "Connecting to Supabase",
+    },
+    {
+      text: "Searching for your profile",
+    },
+    {
+      text: "Found you",
+    },
+    {
+      text: "Fetching your details",
+    },
+    {
+      text: "Locking down your links",
+    },
+    {
+      text: "Trying again 🤦‍♂️",
+    },
+  ];
 
+  //define react hook form
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      name: "",
+      username: "",
+      email: "",
+    },
   });
+  const { isDirty } = form.formState;
   const [loading, setLoading] = useState(false);
 
+  // fetch data from supabase
+  useEffect(() => {
+    if (fetchedData === false) {
+      getData();
+    } else {
+      form.reset({
+        name: profileStore.name,
+        email: profileStore.email,
+        username: profileStore.username,
+      });
+      setTimeout(() => {
+        form.setValue("username", profileStore.username);
+      }, 0);
+    }
+
+    async function getData() {
+      // fetch profile from supabase
+
+      const profileResult = await getProfile();
+      if (profileResult?.profile && profileResult.profile.length > 0) {
+        const firstProfile = profileResult.profile[0];
+        form.reset({
+          name: firstProfile.name,
+          username: firstProfile.username,
+          email: firstProfile.email,
+          // avatar: firstProfile.avatar,
+        });
+        if (firstProfile.avatar) {
+          setAvatarURL(profileResult.avatarData?.publicUrl);
+        }
+        // setAvatarURL(avatarData.publicUrl);
+      }
+      //fetch links from supabase
+      const linkResult = await getLinks();
+      if (Array.isArray(linkResult)) {
+        setLinkStore(linkResult);
+      } else {
+        toast({
+          title: `Couldn't fetch links: ${linkResult.error}`,
+          icon: (
+            <SmileyMelting
+              weight="fill"
+              size={20}
+              className="text-grey-default"
+            />
+          ),
+        });
+      }
+
+      setFetchedData(true);
+    }
+  }, []);
+
+  //onSubmit
   async function onSubmit(data: z.infer<typeof profileFormSchema>) {
     console.log("formData:", data);
-    console.log("avatar:", avatar);
-    console.log("store:", profileData);
+    console.log("avatar:", avatarURL);
+    console.log("store:", profileStore);
     const formText: z.infer<typeof profileFormSchema> = {
       name: data.name,
       username: data.username,
@@ -53,38 +144,81 @@ export default function ProfileForm() {
     setLoading(true);
     if (validationResponse?.endsWith("available")) {
       try {
+        let result: any = null;
         const formData = new FormData();
-        formData.append("file", data.avatar[0]);
-        console.log(formData, formText);
-        // const result = await uploadFile(formData, formText);
-        console.log("File uploaded successfully");
+        if (
+          data.avatar &&
+          data.avatar.length > 0 &&
+          data.avatar[0] !== undefined
+        ) {
+          formData.append("file", data.avatar[0]);
+          console.log(formData, formText);
+          result = await updateProfile(formText, formData);
+        } else if (avatarURL) {
+          const formTextWithAvatar: z.infer<typeof profileFormSchema> = {
+            ...formText,
+            avatar: avatarURL.replace(/^.*\/avatars\//, ""),
+          };
+          result = await updateProfile(formTextWithAvatar);
+        }
+
+        if (result) {
+          toast({
+            icon: (
+              <FloppyDiskBack
+                weight="fill"
+                size={15}
+                className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
+              />
+            ),
+            title: "Your changes have been successfully saved!",
+          });
+        }
       } catch (error) {
+        toast({
+          icon: (
+            <LinkBreak weight="fill" size={20} className="text-grey-default" />
+          ),
+          title: `Couldn't Save, ${error}`,
+        });
         console.error("File upload failed:", error);
       } finally {
         setLoading(false);
       }
     } else {
       setLoading(false);
-      console.error("Username is not available");
+      toast({
+        icon: (
+          <LinkBreak weight="fill" size={20} className="text-grey-default" />
+        ),
+        title: `That username might not be available`,
+      });
     }
   }
 
   //setup zustand to watch for changes
-  const setProfileData = useFormDataStore((state) => state.setProfileData);
-  const setAvatar = useFormDataStore((state) => state.setAvatar);
-  const avatar = useFormDataStore((state) => state.avatar);
-  const profileData = useFormDataStore((state) => state.profileData);
+  const setProfileStore = useFormDataStore((state) => state.setProfileStore);
+  const setAvatarURL = useFormDataStore((state) => state.setAvatarURL);
+  const avatarURL = useFormDataStore((state) => state.avatarURL);
+  const fetchedData = useFormDataStore((state) => state.fetchedData);
+  const setFetchedData = useFormDataStore((state) => state.setFetchedData);
+  const setLinkStore = useFormDataStore((state) => state.setLinkStore);
+  const profileStore = useFormDataStore((state) => state.profileStore);
   const watch = useWatch({ control: form.control });
   useEffect(() => {
-    setProfileData(watch);
-  }, [watch, setProfileData]);
+    setProfileStore({
+      ...watch,
+      name: watch.name || "",
+      username: watch.username || "",
+      email: watch.email || "",
+    });
+  }, [watch, setProfileStore]);
 
   //handle file upload preview
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      setPreview(URL.createObjectURL(file));
-      setAvatar(preview);
+      setAvatarURL(URL.createObjectURL(file));
     }
   }
 
@@ -103,6 +237,8 @@ export default function ProfileForm() {
     if (debouncedUsername) {
       validateUsername(debouncedUsername);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedUsername]);
 
   const validateUsername = async (debouncedUsername: string) => {
@@ -132,61 +268,108 @@ export default function ProfileForm() {
     }
   };
 
-  return (
+  // Prevent user from leaving page without saving
+  //
+  // ------ 1. Listen for browser window/tab close
+  useEffect(() => {
+    const handleWindowBeforeUnload = (e: { returnValue: string }) => {
+      if (isDirty) {
+        const message =
+          "You have unsaved changes. Are you sure you want to leave?";
+        e.returnValue = message;
+        return message;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleWindowBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowBeforeUnload);
+    };
+  }, [isDirty]);
+
+  // ------ 2. Listen for route change
+
+  const allProfile = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="avatar"
           render={({ field }) => (
-            <FormItem className="flex w-full items-center justify-between bg-grey-light p-5">
+            <FormItem className="flex w-full flex-col gap-2 rounded-xl bg-grey-light p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
               <FormLabel className="body-m text-grey-default">
                 Profile Picture
               </FormLabel>
-              <div className="!m-0 flex items-center gap-6">
-                <FormControl>
-                  <Input
-                    type="file"
-                    className="w-6"
-                    //For some reason, react hook form needs this for file types
-                    onChange={(e) => {
-                      handleChange(e);
-                      return field.onChange(e.target.files);
-                    }}
-                  />
-                </FormControl>
-                {preview && (
-                  <Image
-                    src={preview}
-                    width={100}
-                    height={100}
-                    alt="Preview"
-                    className="h-12 w-12 rounded-full"
-                  />
-                )}
-                <FormDescription className="body-s max-w-[215px] text-grey-default">
+              <div className="s !m-0 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+                <div className="relative h-44 min-h-44 w-44 min-w-44 cursor-pointer overflow-hidden rounded-xl">
+                  <div className="absolute z-10 h-full w-full cursor-pointer bg-green-300 opacity-0">
+                    <FormControl>
+                      <Input
+                        type="file"
+                        className="h-full cursor-pointer"
+                        //For some reason, react hook form needs this for file types
+                        onChange={(e) => {
+                          handleChange(e);
+                          return field.onChange(e.target.files);
+                        }}
+                      />
+                    </FormControl>
+                  </div>
+                  {avatarURL ? (
+                    <div className="relative h-full cursor-pointer">
+                      <Image
+                        src={avatarURL}
+                        width={100}
+                        height={100}
+                        objectFit="cover"
+                        alt="Preview"
+                        className="h-full w-full"
+                      />
+                      <div
+                        className="absolute inset-0 flex w-full cursor-pointer flex-col items-center justify-center gap-2 bg-black/50 text-white"
+                        // onClick={() => setPreview(undefined)}
+                      >
+                        <ImageIcon size={40} />
+                        <span className="heading-s">Change Image</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative h-full cursor-pointer">
+                      <div
+                        className="absolute inset-0 flex w-full cursor-pointer flex-col items-center justify-center gap-2 bg-purple-light text-purple-default"
+                        // onClick={() => setPreview(undefined)}
+                      >
+                        <ImageIcon size={40} />
+                        <span className="heading-s">+ Upload Image</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <FormDescription className="body-s w-full max-w-[215px] text-grey-default">
                   Image must be below 1024x1024px. Use PNG or JPG format.
-                  <FormMessage />
                 </FormDescription>
+                <FormMessage />
               </div>
             </FormItem>
           )}
         />
 
-        <div className="flex flex-col gap-3 bg-grey-light p-5">
+        <div className="flex flex-col gap-6 rounded-xl bg-grey-light p-5 sm:gap-3">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center justify-between">
+              <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
                   Name*
                 </FormLabel>
-                <div className="relative flex items-center border-borders">
+                <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
                       type="text"
-                      className="w-96 px-4"
+                      className="w-full px-4"
                       placeholder="e.g. John"
                       {...field}
                     />
@@ -200,20 +383,21 @@ export default function ProfileForm() {
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center justify-between">
+              <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
                   Username*
                 </FormLabel>
-                <div className="relative flex items-center border-borders">
+                <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
                       type="text"
-                      className="w-96 px-4"
+                      className="w-full px-4"
                       placeholder="e.g. John"
                       onChange={(e) => {
                         handleUsernameChange(e);
-                        return field.onChange(e.target.value);
+                        field.onChange(e.target.value);
                       }}
+                      defaultValue={field.value}
                     />
                   </FormControl>
                   <FormMessage className="absolute right-4 top-1/2 -translate-y-1/2 transform" />
@@ -246,15 +430,15 @@ export default function ProfileForm() {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center justify-between">
+              <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
                   Email
                 </FormLabel>
-                <div className="relative flex items-center border-borders">
+                <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
                       type="email"
-                      className="w-96 px-4"
+                      className="w-full px-4"
                       placeholder="e.g. email@example.com"
                       {...field}
                     />
@@ -265,10 +449,27 @@ export default function ProfileForm() {
             )}
           />
         </div>
-        <Button type="submit" disabled={loading}>
-          {loading ? "Uploading..." : "Submit"}
-        </Button>
+
+        <Separator />
+
+        <div className="flex w-full justify-end">
+          <Button type="submit" disabled={loading}>
+            {loading && <Spinner className="mr-2 animate-spin" size={16} />}
+            Save
+          </Button>
+        </div>
       </form>
     </Form>
+  );
+  return fetchedData ? (
+    <>{allProfile}</>
+  ) : (
+    <div className="flex h-full w-full">
+      <MultiStepLoader
+        loadingStates={loadingStates}
+        loading={true}
+        duration={2000}
+      />
+    </div>
   );
 }

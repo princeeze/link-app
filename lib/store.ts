@@ -1,34 +1,41 @@
 import { z } from "zod";
 import { create } from "zustand";
 
-import { formSchema } from "@/lib/schema";
-
-// TODO: Fix Types and Validation
+import { linkFormSchema, profileFormSchema } from "@/lib/schema";
 
 interface FormDataState {
-  formData: z.infer<typeof formSchema>["links"];
-  profileData: {
-    name: string | undefined;
-    username: string | undefined;
-    email: string | undefined;
-    avatar: string | undefined;
-  };
-  setProfileData: (data: any) => void;
-  setFormData: (data: any) => void;
-  avatar: string | undefined;
-  setAvatar: (link: string | undefined) => void;
+  linkStore: z.infer<typeof linkFormSchema>["links"];
+  /* eslint-disable no-unused-vars */
+  setLinkStore: (data: z.infer<typeof linkFormSchema>["links"]) => void;
+  profileStore: z.infer<typeof profileFormSchema>;
+  setProfileStore: (data: z.infer<typeof profileFormSchema>) => void;
+  avatarURL: string | undefined;
+  setAvatarURL: (link: string | undefined) => void;
+  fetchedData: boolean;
+  setFetchedData: (data: boolean) => void;
+  resetStore: () => void;
+  /* eslint-enable no-unused-vars */
 }
 
 export const useFormDataStore = create<FormDataState>((set) => ({
-  formData: [],
-  profileData: {
-    name: undefined,
-    username: undefined,
-    email: undefined,
+  linkStore: [],
+  setLinkStore: (data) => set({ linkStore: data }),
+  profileStore: {
+    name: "",
+    username: "",
+    email: "",
     avatar: undefined,
   },
-  avatar: undefined,
-  setAvatar: (link) => set({ avatar: link }),
-  setProfileData: (data) => set({ profileData: data }),
-  setFormData: (data) => set({ formData: data }),
+  setProfileStore: (data) => set({ profileStore: data }),
+  avatarURL: undefined,
+  setAvatarURL: (link) => set({ avatarURL: link }),
+  fetchedData: false,
+  setFetchedData: (data) => set({ fetchedData: data }),
+  resetStore: () =>
+    set({
+      linkStore: [],
+      profileStore: { name: "", username: "", email: "", avatar: undefined },
+      avatarURL: undefined,
+      fetchedData: false,
+    }),
 }));

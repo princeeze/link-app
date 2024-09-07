@@ -1,13 +1,14 @@
-import { cn } from "@/lib/utils";
 import {
   ArrowRight,
   GithubLogo,
-  YoutubeLogo,
   LinkedinLogo,
+  YoutubeLogo,
 } from "@phosphor-icons/react/dist/ssr";
 
+import { cn } from "@/lib/utils";
+
 interface CardProps {
-  variant: "github" | "youtube" | "linkedin";
+  variant: "github" | "youtube" | "linkedin" | undefined;
   link: string | undefined;
 }
 
@@ -30,19 +31,20 @@ const Card = ({ variant, link }: CardProps) => {
   const cardContent = (
     <div
       className={cn(
-        "rounded-lg w-full flex justify-between items-center py-2.5 text-white px-4",
+        "flex w-full items-center justify-between rounded-lg px-4 py-3 text-white",
         {
           "bg-[#1A1A1A]": variant === "github",
           "bg-[#EE3939]": variant === "youtube",
           "bg-[#2D68FF]": variant === "linkedin",
-        }
+          "bg-[#eee]": variant === undefined,
+        },
       )}
     >
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         {cardLogo()}
         <span className="text-xs capitalize">{variant}</span>
       </div>
-      <ArrowRight />
+      {<ArrowRight className={cn({ "opacity-0": variant === undefined })} />}
     </div>
   );
 
@@ -51,7 +53,13 @@ const Card = ({ variant, link }: CardProps) => {
       {cardContent}
     </a>
   ) : (
-    <div className="w-full cursor-not-allowed opacity-50">{cardContent}</div>
+    <div
+      className={cn("w-full cursor-not-allowed opacity-50", {
+        "opacity-100": variant == undefined,
+      })}
+    >
+      {cardContent}
+    </div>
   );
 };
 

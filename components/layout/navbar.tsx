@@ -17,6 +17,7 @@ import {
 } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
+import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
@@ -25,9 +26,13 @@ export default function Navbar() {
   const router = useRouter();
   const [isSticky, setIsSticky] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const resetStore = useFormDataStore((state) => state.resetStore);
 
   const handleLogout = async () => {
+    // clear stores
+    resetStore();
     await logout();
+
     toast({
       icon: <Smiley weight="fill" size={20} className="text-grey-default" />,
       title: "Sign in soon!",
