@@ -213,7 +213,7 @@ export default function LinkForm() {
         </Button>
         {fields.map((field, index) => (
           <div
-            key={field.id}
+            key={`${field.id}-${Math.random().toString(36).slice(7)}`}
             className="flex w-full flex-col gap-3 rounded-xl bg-grey-light p-5"
           >
             <div className="flex w-full items-center justify-between">

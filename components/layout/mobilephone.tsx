@@ -67,7 +67,7 @@ export default function MobilePhone() {
                 <Card
                   variant={item.platform}
                   link={item.link}
-                  key={item.link}
+                  key={`${item.platform}-${Math.random().toString(36).slice(7)}`}
                 />
               );
             })}
