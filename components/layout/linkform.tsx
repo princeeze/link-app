@@ -101,25 +101,17 @@ export default function LinkForm() {
       // fetch profile from supabase
 
       const profileResult = await getProfile();
-      console.log("foolishresult", profileResult);
-      if (profileResult !== undefined) {
-        if (profileResult?.profile) {
-          const { profile, avatarData } = profileResult;
-          setProfileStore(profile);
-          ``;
-          setAvatar(avatarData.publicUrl);
-        }
-      } else {
-        toast({
-          title: `Couldn't fetch profile`,
-          icon: (
-            <SmileyMelting
-              weight="fill"
-              size={20}
-              className="text-grey-default"
-            />
-          ),
+      if (profileResult?.profile && profileResult.profile.length > 0) {
+        const firstProfile = profileResult.profile[0];
+        setProfileStore({
+          name: firstProfile.name,
+          username: firstProfile.username,
+          email: firstProfile.email,
+          // avatar: firstProfile.avatar,
         });
+        if (firstProfile.avatar) {
+          setAvatarURL(profileResult.avatarData?.publicUrl);
+        }
       }
       //fetch links from supabase
       const linkResult = await getLinks();
@@ -146,7 +138,7 @@ export default function LinkForm() {
   const setLinkStore = useFormDataStore((state) => state.setLinkStore);
   const linkStore = useFormDataStore((state) => state.linkStore);
   const setProfileStore = useFormDataStore((state) => state.setProfileStore);
-  const setAvatar = useFormDataStore((state) => state.setAvatarURL);
+  const setAvatarURL = useFormDataStore((state) => state.setAvatarURL);
   const fetchedData = useFormDataStore((state) => state.fetchedData);
   const setFetchedData = useFormDataStore((state) => state.setFetchedData);
   const watch = useWatch({ control: form.control, name: "links" });

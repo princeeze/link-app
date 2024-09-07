@@ -150,26 +150,25 @@ export async function getProfile() {
 
     // Get profile data from Supabase
     const userId = user.id;
-    const { data, error } = await supabase
+    const { data: profile, error } = await supabase
       .from("profile")
       .select("*")
       .eq("user_id", userId);
     if (error) {
       throw error;
     }
-
+    console.log("Profile data:", profile);
     // Get avatar URL from Supabase
+    if (profile.length > 0) {
+      console.log("Avatar URL:", profile[0].avatar);
+      const { data: avatarData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(profile[0].avatar);
 
-    const { data: avatarData } = supabase.storage
-      .from("avatars")
-      .getPublicUrl(data[0].avatar);
-
-    if (data.length > 0) {
-      // Check if data is not empty
-      const profile = data[0]; // Assuming data is an array and you need the first item
-      console.log("Profile data:", profile);
-      console.log("Avatar URL:", avatarData);
+      console.log("Avatar data:", avatarData);
       return { profile, avatarData };
+    } else {
+      return { profile };
     }
   } catch (error: any) {
     console.error("Error getting profile:", error.message);

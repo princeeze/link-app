@@ -97,26 +97,18 @@ export default function ProfileForm() {
       // fetch profile from supabase
 
       const profileResult = await getProfile();
-      if (profileResult?.profile) {
-        const { profile, avatarData } = profileResult;
+      if (profileResult?.profile && profileResult.profile.length > 0) {
+        const firstProfile = profileResult.profile[0];
         form.reset({
-          name: profile.name,
-          username: profile.username,
-          email: profile.email,
-          // avatar: avatarData,
+          name: firstProfile.name,
+          username: firstProfile.username,
+          email: firstProfile.email,
+          // avatar: firstProfile.avatar,
         });
-        setAvatarURL(avatarData.publicUrl);
-      } else {
-        toast({
-          title: `Couldn't fetch profile`,
-          icon: (
-            <SmileyMelting
-              weight="fill"
-              size={20}
-              className="text-grey-default"
-            />
-          ),
-        });
+        if (firstProfile.avatar) {
+          setAvatarURL(profileResult.avatarData?.publicUrl);
+        }
+        // setAvatarURL(avatarData.publicUrl);
       }
       //fetch links from supabase
       const linkResult = await getLinks();
@@ -403,6 +395,7 @@ export default function ProfileForm() {
                       placeholder="e.g. John"
                       onChange={(e) => {
                         handleUsernameChange(e);
+                        field.onChange(e.target.value);
                       }}
                       defaultValue={field.value}
                     />
