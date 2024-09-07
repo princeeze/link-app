@@ -95,7 +95,7 @@ export default function Navbar() {
           href={"/dashboard/profile"}
         >
           <UserCircle weight="bold" className="h-5 w-5 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline"> Profile Details</span>
+          <span className="hidden sm:inline"> Profile</span>
         </Link>
       </div>
       <div className="flex items-center gap-2 sm:gap-3">

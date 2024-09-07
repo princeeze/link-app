@@ -13,7 +13,7 @@ export default function DashboardLayout({
         <div className="flex h-full flex-col">
           <main className="grid flex-1 grid-cols-10 gap-4">
             <MobilePhone />
-            <div className="col-span-10 flex min-h-0 w-full flex-grow rounded-md bg-white p-6 sm:p-10 lg:col-span-6">
+            <div className="col-span-10 flex min-h-0 w-full flex-grow rounded-md bg-white p-4 sm:p-8 lg:col-span-6">
               {children}
             </div>
           </main>

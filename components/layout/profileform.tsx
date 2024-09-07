@@ -78,7 +78,7 @@ export default function ProfileForm() {
   const { isDirty } = form.formState;
   const [loading, setLoading] = useState(false);
 
-  //fetch data from supabase
+  // fetch data from supabase
   useEffect(() => {
     if (fetchedData === false) {
       getData();
@@ -297,12 +297,12 @@ export default function ProfileForm() {
           control={form.control}
           name="avatar"
           render={({ field }) => (
-            <FormItem className="flex w-full items-center justify-between rounded-xl bg-grey-light p-5">
+            <FormItem className="flex w-full flex-col gap-2 rounded-xl bg-grey-light p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
               <FormLabel className="body-m text-grey-default">
                 Profile Picture
               </FormLabel>
-              <div className="!m-0 flex items-center gap-6">
-                <div className="relative h-44 w-44 cursor-pointer overflow-hidden rounded-xl">
+              <div className="s !m-0 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+                <div className="relative h-44 min-h-44 w-44 min-w-44 cursor-pointer overflow-hidden rounded-xl">
                   <div className="absolute z-10 h-full w-full cursor-pointer bg-green-300 opacity-0">
                     <FormControl>
                       <Input
@@ -347,7 +347,7 @@ export default function ProfileForm() {
                   )}
                 </div>
 
-                <FormDescription className="body-s max-w-[215px] text-grey-default">
+                <FormDescription className="body-s w-full max-w-[215px] text-grey-default">
                   Image must be below 1024x1024px. Use PNG or JPG format.
                 </FormDescription>
                 <FormMessage />
@@ -356,20 +356,20 @@ export default function ProfileForm() {
           )}
         />
 
-        <div className="flex flex-col gap-3 rounded-xl bg-grey-light p-5">
+        <div className="flex flex-col gap-6 rounded-xl bg-grey-light p-5 sm:gap-3">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center justify-between">
+              <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
                   Name*
                 </FormLabel>
-                <div className="relative flex items-center border-borders">
+                <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
                       type="text"
-                      className="w-96 px-4"
+                      className="w-full px-4"
                       placeholder="e.g. John"
                       {...field}
                     />
@@ -383,15 +383,15 @@ export default function ProfileForm() {
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center justify-between">
+              <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
                   Username*
                 </FormLabel>
-                <div className="relative flex items-center border-borders">
+                <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
                       type="text"
-                      className="w-96 px-4"
+                      className="w-full px-4"
                       placeholder="e.g. John"
                       onChange={(e) => {
                         handleUsernameChange(e);
@@ -430,15 +430,15 @@ export default function ProfileForm() {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center justify-between">
+              <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
                   Email
                 </FormLabel>
-                <div className="relative flex items-center border-borders">
+                <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
                       type="email"
-                      className="w-96 px-4"
+                      className="w-full px-4"
                       placeholder="e.g. email@example.com"
                       {...field}
                     />
@@ -452,10 +452,12 @@ export default function ProfileForm() {
 
         <Separator />
 
-        <Button type="submit" disabled={loading} className="ml-auto">
-          {loading && <Spinner className="mr-2 animate-spin" size={16} />}
-          Save
-        </Button>
+        <div className="flex w-full justify-end">
+          <Button type="submit" disabled={loading}>
+            {loading && <Spinner className="mr-2 animate-spin" size={16} />}
+            Save
+          </Button>
+        </div>
       </form>
     </Form>
   );
