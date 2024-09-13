@@ -1,0 +1,7 @@
+- [ ] Add shimmer on loading
+- [ ] Make routing better
+- [ ] Fix url validation
+- [ ] Fix typing link closes input
+- [ ] Fix aggressive validation
+- [ ] Fix error message display
+- [ ] Fix platform fetch error

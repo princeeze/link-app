@@ -19,7 +19,6 @@ A simple app to store and share your links.
 - [x] Add link deletion
 - [ ] Add link sharing
 - [ ] Add link dragging
-- [ ] Fix platform fetch error
 
 ## Tech Stack
 
