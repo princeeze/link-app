@@ -52,7 +52,7 @@ export const linkSchema = z.object({
 });
 
 export const linkFormSchema = z.object({
-  links: z.array(linkSchema).min(1, "At least one link is required"),
+  links: z.array(linkSchema),
 });
 
 export const profileFormSchema = z.object({

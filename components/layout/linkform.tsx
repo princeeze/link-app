@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -45,10 +44,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
 export default function LinkForm() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [selectedPlatform, setSelectedPlatform] = useState<string>("github");
-  const loadingStates = [
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const loadingText = [
     {
       text: "Connecting to Supabase",
     },
@@ -68,13 +65,17 @@ export default function LinkForm() {
       text: "Trying again 🤦‍♂️",
     },
   ];
-
-  //placeholders for input
   const placeholders: Record<string, string> = {
     github: "e.g. https://www.github.com/johnappleseed",
     youtube: "e.g. https://www.youtube.com/johnappleseed",
     linkedin: "e.g. https://www.linkedin.com/in/johnappleseed",
   };
+  const setLinkStore = useFormDataStore((state) => state.setLinkStore);
+  const linkStore = useFormDataStore((state) => state.linkStore);
+  const setProfileStore = useFormDataStore((state) => state.setProfileStore);
+  const setAvatarURL = useFormDataStore((state) => state.setAvatarURL);
+  const fetchedData = useFormDataStore((state) => state.fetchedData);
+  const setFetchedData = useFormDataStore((state) => state.setFetchedData);
 
   //define react hook form
   const form = useForm<z.infer<typeof linkFormSchema>>({
@@ -88,85 +89,59 @@ export default function LinkForm() {
     name: "links",
     control: form.control,
   });
+  const watch = useWatch({ control: form.control, name: "links" });
 
   //fetch data from supabase
+  async function getData() {
+    // fetch profile from supabase
+    const profileResult = await getProfile();
+    if (profileResult?.profile && profileResult.profile.length > 0) {
+      const firstProfile = profileResult.profile[0];
+      setProfileStore({
+        name: firstProfile.name,
+        username: firstProfile.username,
+        email: firstProfile.email,
+        // avatar: firstProfile.avatar,
+      });
+      if (firstProfile.avatar) {
+        setAvatarURL(profileResult.avatarData?.publicUrl);
+      }
+    }
+    //fetch links from supabase
+    const linkResult = await getLinks();
+    if (Array.isArray(linkResult)) {
+      console.log(linkResult);
+      form.reset(
+        { links: linkResult },
+        { keepErrors: false, keepDirty: false },
+      );
+    } else {
+      toast({
+        title: `Couldn't fetch links: ${linkResult.error}`,
+        icon: (
+          <SmileyMelting
+            weight="fill"
+            size={20}
+            className="text-grey-default"
+          />
+        ),
+      });
+    }
+
+    setFetchedData(true);
+  }
+
   useEffect(() => {
     if (fetchedData === false) {
       getData();
     } else {
       form.reset({ links: linkStore });
     }
-
-    async function getData() {
-      // fetch profile from supabase
-
-      const profileResult = await getProfile();
-      if (profileResult?.profile && profileResult.profile.length > 0) {
-        const firstProfile = profileResult.profile[0];
-        setProfileStore({
-          name: firstProfile.name,
-          username: firstProfile.username,
-          email: firstProfile.email,
-          // avatar: firstProfile.avatar,
-        });
-        if (firstProfile.avatar) {
-          setAvatarURL(profileResult.avatarData?.publicUrl);
-        }
-      }
-      //fetch links from supabase
-      const linkResult = await getLinks();
-      if (Array.isArray(linkResult)) {
-        form.reset({ links: linkResult });
-      } else {
-        toast({
-          title: `Couldn't fetch links: ${linkResult.error}`,
-          icon: (
-            <SmileyMelting
-              weight="fill"
-              size={20}
-              className="text-grey-default"
-            />
-          ),
-        });
-      }
-
-      setFetchedData(true);
-    }
   }, []);
 
-  //setup zustand to watch for changes
-  const setLinkStore = useFormDataStore((state) => state.setLinkStore);
-  const linkStore = useFormDataStore((state) => state.linkStore);
-  const setProfileStore = useFormDataStore((state) => state.setProfileStore);
-  const setAvatarURL = useFormDataStore((state) => state.setAvatarURL);
-  const fetchedData = useFormDataStore((state) => state.fetchedData);
-  const setFetchedData = useFormDataStore((state) => state.setFetchedData);
-  const watch = useWatch({ control: form.control, name: "links" });
   useEffect(() => {
     setLinkStore(watch);
-  }, [watch, setLinkStore]);
-
-  //submit links to supabase
-  const onSubmit = async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
-    const result = await updateLinks(linkStore);
-    if (result.error) {
-      setErrorMessage(result.error);
-    } else {
-      toast({
-        icon: (
-          <FloppyDiskBack
-            weight="fill"
-            size={15}
-            className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
-          />
-        ),
-        title: "Your changes have been successfully saved!",
-      });
-    }
-    setIsLoading(false);
-  };
+  }, [watch, setLinkStore, form]);
 
   // Prevent user from leaving page without saving
   //
@@ -190,6 +165,36 @@ export default function LinkForm() {
 
   // ------ 2. Listen for route change
 
+  //submit links to supabase
+  const onSubmit = async () => {
+    setIsSubmitting(true);
+    const result = await updateLinks(linkStore);
+    if (result.error) {
+      toast({
+        icon: (
+          <SmileyMelting
+            weight="fill"
+            size={20}
+            className="text-grey-default"
+          />
+        ),
+        title: "An error occurred: " + result.error,
+      });
+    } else {
+      toast({
+        icon: (
+          <FloppyDiskBack
+            weight="fill"
+            size={15}
+            className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
+          />
+        ),
+        title: "Your changes have been successfully saved!",
+      });
+    }
+    setIsSubmitting(false);
+  };
+
   const allLinks = (
     <Form {...form}>
       <form
@@ -199,6 +204,7 @@ export default function LinkForm() {
         <Button
           variant="secondary"
           className="w-full"
+          type="button"
           onClick={() => {
             if (linkStore.length === 5) {
               toast({
@@ -213,7 +219,7 @@ export default function LinkForm() {
         </Button>
         {fields.map((field, index) => (
           <div
-            key={`${field.id}-${Math.random().toString(36).slice(7)}`}
+            key={`${field.id}`}
             className="flex w-full flex-col gap-3 rounded-xl bg-grey-light p-5"
           >
             <div className="flex w-full items-center justify-between">
@@ -240,11 +246,8 @@ export default function LinkForm() {
                     Platform
                   </FormLabel>
                   <Select
-                    defaultValue="github"
-                    onValueChange={(value: string) => {
-                      field.onChange(value);
-                      setSelectedPlatform(value);
-                    }}
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
                   >
                     <div className="relative flex w-full items-center border-borders">
                       <FormControl>
@@ -304,28 +307,36 @@ export default function LinkForm() {
             <FormField
               control={form.control}
               name={`links.${index}.link`}
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormLabel className="body-s text-grey-dark">Link</FormLabel>
-                  <div className="relative flex items-center border-borders">
-                    <LucideLink
-                      className="absolute left-4 top-1/2 -translate-y-1/2 transform text-grey-default"
-                      size={16}
-                    />
-                    <FormControl>
-                      <Input
-                        placeholder={placeholders[selectedPlatform]}
-                        className={cn(
-                          "pl-11 pr-4",
-                          fieldState.error && "border-red text-red",
-                        )}
-                        {...field}
+              render={({ field, fieldState }) => {
+                // Set placeholder based on the selected platform for this input
+                const platform =
+                  form.getValues(`links.${index}.platform`) || "github";
+                const placeholder = placeholders[platform] || "";
+                return (
+                  <FormItem>
+                    <FormLabel className="body-s text-grey-dark">
+                      Link
+                    </FormLabel>
+                    <div className="relative flex items-center border-borders">
+                      <LucideLink
+                        className="absolute left-4 top-1/2 -translate-y-1/2 transform text-grey-default"
+                        size={16}
                       />
-                    </FormControl>
-                    <FormMessage className="absolute right-4 top-1/2 -translate-y-1/2 transform" />
-                  </div>
-                </FormItem>
-              )}
+                      <FormControl>
+                        <Input
+                          placeholder={placeholder}
+                          className={cn(
+                            "pl-11 pr-4",
+                            fieldState.error && "border-red text-red",
+                          )}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="absolute right-4 top-1/2 -translate-y-1/2 transform" />
+                    </div>
+                  </FormItem>
+                );
+              }}
             />
           </div>
         ))}
@@ -346,11 +357,8 @@ export default function LinkForm() {
 
         <Separator />
 
+        <FormMessage />
         <FormItem className="flex w-full items-center">
-          <FormMessage />
-          <FormDescription>
-            {errorMessage && <span className="text-red">{errorMessage}</span>}
-          </FormDescription>
           <FormControl
             onClick={() => {
               if (linkStore.length === 0) {
@@ -367,8 +375,8 @@ export default function LinkForm() {
               }
             }}
           >
-            <Button disabled={isLoading} className="ml-auto">
-              {isLoading && (
+            <Button disabled={isSubmitting} className="ml-auto">
+              {isSubmitting && (
                 <Spinner
                   weight="bold"
                   size={24}
@@ -388,7 +396,7 @@ export default function LinkForm() {
   ) : (
     <div className="flex h-full w-full">
       <MultiStepLoader
-        loadingStates={loadingStates}
+        loadingStates={loadingText}
         loading={true}
         duration={2000}
       />
