@@ -1,8 +1,8 @@
 - [x] Fix placeholder issue
 - [x] Fix aggressive validation
 - [ ] Add shimmer on loading
-- [ ] Make routing better
-- [ ] Fix url validation
+- [x] Make routing better
+- [x] Fix url validation
 - [ ] Fix typing link closes input
 - [ ] Fix error message display
 - [ ] Change profile email to title

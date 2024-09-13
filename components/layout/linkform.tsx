@@ -189,7 +189,7 @@ export default function LinkForm() {
             className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
           />
         ),
-        title: "Your changes have been successfully saved!",
+        title: "Saved succesfully!",
       });
     }
     setIsSubmitting(false);

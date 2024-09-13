@@ -171,7 +171,7 @@ export default function ProfileForm() {
                 className="text-grey-default shadow-[2px_2px_0px_#FFFFFF]"
               />
             ),
-            title: "Your changes have been successfully saved!",
+            title: "Saved succesfully!",
           });
         }
       } catch (error) {
