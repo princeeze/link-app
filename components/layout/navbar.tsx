@@ -9,10 +9,12 @@ import { logout } from "@/app/(auth)/auth-client";
 import logoSmall from "@/public/logo-small.svg";
 import logo from "@/public/logo.svg";
 import {
-  Eye,
+  ClipboardText,
   Link as LinkLogo,
+  Share,
   SignOut,
   Smiley,
+  SmileyMelting,
   UserCircle,
 } from "@phosphor-icons/react";
 
@@ -27,6 +29,7 @@ export default function Navbar() {
   const [isSticky, setIsSticky] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const resetStore = useFormDataStore((state) => state.resetStore);
+  const profileStore = useFormDataStore((state) => state.profileStore);
 
   const handleLogout = async () => {
     // clear stores
@@ -63,6 +66,32 @@ export default function Navbar() {
     }
   }, [lastScrollY]);
 
+  const handleShare = () => {
+    if (profileStore.username) {
+      navigator.clipboard.writeText(profileStore.username);
+      toast({
+        icon: (
+          <ClipboardText
+            weight="fill"
+            size={20}
+            className="animate-bounce text-grey-default duration-500"
+          />
+        ),
+        title: "Copied to clipboard!",
+      });
+    } else {
+      toast({
+        icon: (
+          <SmileyMelting
+            weight="fill"
+            size={20}
+            className="text-grey-default"
+          />
+        ),
+        title: "Set a username first!",
+      });
+    }
+  };
   return (
     <div
       className={cn(
@@ -109,9 +138,10 @@ export default function Navbar() {
         <Button
           variant={"secondary"}
           className="px-3 py-3 sm:px-[27px] sm:py-[11px]"
+          onClick={handleShare}
         >
-          <Eye weight="bold" size={20} className="sm:hidden" />
-          <span className="hidden sm:inline">Preview</span>
+          <Share weight="bold" size={20} className="sm:hidden" />
+          <span className="hidden sm:inline">Share</span>
         </Button>
       </div>
     </div>
