@@ -75,7 +75,7 @@ export default function SignupForm() {
           ),
           title: "Welcome!",
         });
-        router.push("/dashboard/links");
+        router.push("/links");
       }
     }
   }

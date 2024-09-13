@@ -28,7 +28,7 @@ export default function Home() {
         </p>
         <div className="space-x-4">
           <Link
-            href="/dashboard/links
+            href="/links
                     "
             className={buttonVariants({
               variant: "default",

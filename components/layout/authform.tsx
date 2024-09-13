@@ -60,7 +60,7 @@ export default function AuthForm() {
         title: "Welcome back!",
       });
       setTimeout(() => {
-        router.push("/dashboard/links");
+        router.push("/links");
       }, 100); // Small delay to ensure session is fully updated
       // successMessage ? setIsLoading(true) : setIsLoading(false);
     }

@@ -76,11 +76,11 @@ export default function Navbar() {
         <Link
           className={cn(
             "heading-s flex items-center gap-2 rounded-lg px-6 py-[11px] hover:text-purple-default sm:px-[27px]",
-            pathname === "/dashboard/links"
+            pathname === "/links"
               ? "bg-purple-light text-purple-default"
               : "bg-white text-grey-default",
           )}
-          href={"/dashboard/links"}
+          href={"/links"}
         >
           <LinkLogo weight="bold" className="h-5 w-5 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline"> Links</span>
@@ -88,11 +88,11 @@ export default function Navbar() {
         <Link
           className={cn(
             "heading-s flex items-center gap-2 rounded-lg px-6 py-[11px] hover:text-purple-default sm:px-[27px]",
-            pathname === "/dashboard/profile"
+            pathname === "/profile"
               ? "bg-purple-light text-purple-default"
               : "bg-white text-grey-default",
           )}
-          href={"/dashboard/profile"}
+          href={"/profile"}
         >
           <UserCircle weight="bold" className="h-5 w-5 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline"> Profile</span>

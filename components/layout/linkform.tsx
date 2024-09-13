@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-import { getLinks, updateLinks } from "@/app/(home)/dashboard/links/links";
-import { getProfile } from "@/app/(home)/dashboard/profile/profile";
+import { getLinks, updateLinks } from "@/app/(dashboard)/links/links";
+import { getProfile } from "@/app/(dashboard)/profile/profile";
 import noLinks from "@/public/no-links.svg";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-import { getLinks } from "@/app/(home)/dashboard/links/links";
+import { getLinks } from "@/app/(dashboard)/links/links";
 import {
   checkUsernameAvailability,
   getProfile,
   updateProfile,
-} from "@/app/(home)/dashboard/profile/profile";
+} from "@/app/(dashboard)/profile/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FloppyDiskBack,
