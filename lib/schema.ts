@@ -12,11 +12,7 @@ export const signupSchema = z
       .email("Invalid email address")
       .min(1, "Email is required"),
 
-    password: z
-      .string()
-      .min(6, "Too short")
-      .regex(/[A-Za-z]/, "Password must contain at least one letter")
-      .regex(/\d/, "Password must contain at least one number"),
+    password: z.string().min(6, "Too short"),
 
     confirmPassword: z.string().min(1, "Confirm Password is required"),
   })
@@ -29,7 +25,24 @@ export const linkSchema = z.object({
   platform: z.enum(["github", "youtube", "linkedin"]),
   link: z
     .string()
-    .url("Invalid URL")
+    .min(1, "Link is required")
+    .transform((val) => {
+      // Automatically prepend 'https://' if no scheme is provided
+      if (!/^https?:\/\//.test(val)) {
+        return `https://${val}`;
+      }
+      return val;
+    })
+    .refine(
+      (val) => {
+        // A more permissive URL pattern
+        const urlPattern = /^(https?:\/\/)?([\d./A-Za-z-]+)\.([\d./A-Za-z-]+)$/;
+        return urlPattern.test(val);
+      },
+      {
+        message: "Invalid link",
+      },
+    )
     .refine((val) => {
       if (val.includes("github")) return val.includes("github.com/");
       if (val.includes("youtube")) return val.includes("youtube.com/");

@@ -13,6 +13,12 @@ interface CardProps {
 }
 
 const Card = ({ variant, link }: CardProps) => {
+  const modifiedLink = link
+    ? // eslint-disable-next-line unicorn/no-nested-ternary
+      link.startsWith("https://") || link.startsWith("http://")
+      ? link
+      : `https://${link}`
+    : undefined;
   const cardLogo = () => {
     switch (variant) {
       case "github": {
@@ -49,7 +55,7 @@ const Card = ({ variant, link }: CardProps) => {
   );
 
   return link ? (
-    <a href={link} target="_blank" className="w-full">
+    <a href={modifiedLink} target="_blank" className="w-full">
       {cardContent}
     </a>
   ) : (
