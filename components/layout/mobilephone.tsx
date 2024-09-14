@@ -4,11 +4,13 @@ import Image from "next/image";
 
 import Card from "@/components/ui/card";
 import { useFormDataStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 export default function MobilePhone() {
   const linkStore = useFormDataStore((state) => state.linkStore);
   const profileStore = useFormDataStore((state) => state.profileStore);
   const avatarURL = useFormDataStore((state) => state.avatarURL);
+  const fetchedData = useFormDataStore((state) => state.fetchedData);
 
   return (
     <div className="col-span-4 hidden bg-white py-4 lg:inline">
@@ -42,7 +44,14 @@ export default function MobilePhone() {
                 className="h-20 w-20 rounded-full object-cover outline outline-4 outline-purple-default"
               />
             ) : (
-              <div className="h-20 w-20 rounded-full bg-[#EEEEEE]"></div>
+              <div
+                className={cn(
+                  "h-20 w-20 rounded-full",
+                  fetchedData === false
+                    ? "animate-pulse bg-[#EEEEEE]"
+                    : "bg-[#EEEEEE]",
+                )}
+              ></div>
             )}
             <div className="flex flex-col items-center gap-1">
               {profileStore.name ? (
@@ -50,14 +59,28 @@ export default function MobilePhone() {
                   {profileStore.name}
                 </span>
               ) : (
-                <div className="h-3 w-32 rounded-full bg-[#EEEEEE]"></div>
+                <div
+                  className={cn(
+                    "h-3 w-32 rounded-full",
+                    fetchedData === false
+                      ? "animate-pulse bg-[#EEEEEE]"
+                      : "bg-[#EEEEEE]",
+                  )}
+                ></div>
               )}
               {profileStore.email ? (
                 <span className="body-s text-grey-default">
                   {profileStore.email}
                 </span>
               ) : (
-                <div className="mt-[1vh] h-1.5 w-20 rounded-full bg-[#EEEEEE]"></div>
+                <div
+                  className={cn(
+                    "mt-[1vh] h-1.5 w-20 rounded-full",
+                    fetchedData === false
+                      ? "animate-pulse bg-[#EEEEEE]"
+                      : "bg-[#EEEEEE]",
+                  )}
+                ></div>
               )}
             </div>
           </div>
@@ -72,7 +95,12 @@ export default function MobilePhone() {
               );
             })}
             {Array.from({ length: 5 - linkStore.length }).map((_, i) => (
-              <Card key={i} variant={undefined} link={undefined} />
+              <Card
+                key={i}
+                variant={undefined}
+                link={undefined}
+                className={cn({ "animate-pulse": fetchedData === false })}
+              />
             ))}
           </div>
         </div>

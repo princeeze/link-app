@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 interface CardProps {
   variant: "github" | "youtube" | "linkedin" | undefined;
   link: string | undefined;
+  className?: string;
 }
 
-const Card = ({ variant, link }: CardProps) => {
+const Card = ({ variant, link, className }: CardProps) => {
   const modifiedLink = link
     ? // eslint-disable-next-line unicorn/no-nested-ternary
       link.startsWith("https://") || link.startsWith("http://")
@@ -38,6 +39,7 @@ const Card = ({ variant, link }: CardProps) => {
     <div
       className={cn(
         "flex w-full items-center justify-between rounded-lg px-4 py-3 text-white",
+        className,
         {
           "bg-[#1A1A1A]": variant === "github",
           "bg-[#EE3939]": variant === "youtube",

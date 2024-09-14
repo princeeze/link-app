@@ -1,9 +1,9 @@
 - [x] Fix placeholder issue
 - [x] Fix aggressive validation
-- [ ] Add shimmer on loading
 - [x] Make routing better
 - [x] Fix url validation
-- [ ] Fix typing link closes input
-- [ ] Fix error message display
+- [x] Fix typing link closes input
+- [] Add shimmer on loading
+- [x] Fix error message display
 - [ ] Change profile email to title
 - [x] Fix platform fetch error
