@@ -95,7 +95,7 @@ export default function Navbar() {
   return (
     <div
       className={cn(
-        "z-50 flex w-full items-center justify-between rounded-xl bg-white px-3 py-2 transition-all duration-300 ease-in-out sm:px-6",
+        "z-20 flex w-full items-center justify-between rounded-xl bg-white px-3 py-2 transition-all duration-300 ease-in-out sm:px-6",
         isSticky ? "sticky top-0 bg-white" : "bg-white",
       )}
     >

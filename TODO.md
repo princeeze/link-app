@@ -3,7 +3,8 @@
 - [x] Make routing better
 - [x] Fix url validation
 - [x] Fix typing link closes input
-- [] Add shimmer on loading
+- [x] Add shimmer on loading
 - [x] Fix error message display
-- [ ] Change profile email to title
-- [x] Fix platform fetch error
+- [x] Change profile email to title
+- [ ] Add floating mobile preview
+- [x] Fix platform fetch errors

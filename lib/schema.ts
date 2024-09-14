@@ -55,7 +55,7 @@ export const linkFormSchema = z.object({
 export const profileFormSchema = z.object({
   name: z.string().min(3, "Too short"),
   username: z.string().min(4, "Too short").regex(/^\w+$/, "Invalid Username"),
-  email: z.string().min(1, "Required").email("Invalid email"),
+  email: z.string().min(1, "Required"),
   avatar: z
     .any()
     // .refine((files) => files?.length === 1, "Profile picture is required")

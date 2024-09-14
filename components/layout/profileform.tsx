@@ -88,9 +88,14 @@ export default function ProfileForm() {
         email: profileStore.email,
         username: profileStore.username,
       });
+
+      //trigger store update
       setTimeout(() => {
         form.setValue("username", profileStore.username);
       }, 0);
+
+      //trigger username validation
+      setFormUser(profileStore.username);
     }
 
     async function getData() {
@@ -105,6 +110,8 @@ export default function ProfileForm() {
           email: firstProfile.email,
           // avatar: firstProfile.avatar,
         });
+        //trigger username validation
+        setFormUser(firstProfile.username);
         if (firstProfile.avatar) {
           setAvatarURL(profileResult.avatarData?.publicUrl);
         }
@@ -133,9 +140,6 @@ export default function ProfileForm() {
 
   //onSubmit
   async function onSubmit(data: z.infer<typeof profileFormSchema>) {
-    console.log("formData:", data);
-    console.log("avatar:", avatarURL);
-    console.log("store:", profileStore);
     const formText: z.infer<typeof profileFormSchema> = {
       name: data.name,
       username: data.username,
@@ -322,9 +326,8 @@ export default function ProfileForm() {
                         src={avatarURL}
                         width={100}
                         height={100}
-                        objectFit="cover"
                         alt="Preview"
-                        className="h-full w-full"
+                        className="h-full w-full object-cover"
                       />
                       <div
                         className="absolute inset-0 flex w-full cursor-pointer flex-col items-center justify-center gap-2 bg-black/50 text-white"
@@ -432,14 +435,14 @@ export default function ProfileForm() {
             render={({ field }) => (
               <FormItem className="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <FormLabel className="body-m text-grey-default">
-                  Email
+                  Title
                 </FormLabel>
                 <div className="relative flex items-center border-borders sm:min-w-[70%]">
                   <FormControl>
                     <Input
-                      type="email"
+                      type="text"
                       className="w-full px-4"
-                      placeholder="e.g. email@example.com"
+                      placeholder="e.g. Product Designer"
                       {...field}
                     />
                   </FormControl>
