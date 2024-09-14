@@ -129,46 +129,68 @@ export async function checkUsernameAvailability(username: string) {
   }
 }
 
-export async function getProfile() {
+export async function getProfile(username?: string) {
   const supabase = createClient();
-
   try {
-    // Validate user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    //check if username is provided
+    if (username) {
+      const { data: profile, error } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("username", username);
+      if (error) {
+        throw error;
+      }
+      console.log("Profile data:", profile);
+      // Get avatar URL from Supabase
+      if (profile.length > 0) {
+        console.log("Avatar URL:", profile[0].avatar);
+        const { data: avatarData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(profile[0].avatar);
 
-    if (authError) {
-      console.error("Authentication error:", authError);
-      throw new Error("Failed to authenticate user");
-    }
-
-    if (!user) {
-      throw new Error("User is not authenticated");
-    }
-
-    // Get profile data from Supabase
-    const userId = user.id;
-    const { data: profile, error } = await supabase
-      .from("profile")
-      .select("*")
-      .eq("user_id", userId);
-    if (error) {
-      throw error;
-    }
-    console.log("Profile data:", profile);
-    // Get avatar URL from Supabase
-    if (profile.length > 0) {
-      console.log("Avatar URL:", profile[0].avatar);
-      const { data: avatarData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(profile[0].avatar);
-
-      console.log("Avatar data:", avatarData);
-      return { profile, avatarData };
+        console.log("Avatar data:", avatarData);
+        return { profile, avatarData };
+      } else {
+        return { profile };
+      }
     } else {
-      return { profile };
+      // Validate user
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        throw new Error(`Authentication error: ${authError.message}`);
+      }
+
+      if (!user) {
+        throw new Error("User is not authenticated");
+      }
+
+      const userId = user.id;
+      // Get profile data from Supabase
+      const { data: profile, error } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("user_id", userId);
+      if (error) {
+        throw error;
+      }
+      console.log("Profile data:", profile);
+      // Get avatar URL from Supabase
+      if (profile.length > 0) {
+        console.log("Avatar URL:", profile[0].avatar);
+        const { data: avatarData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(profile[0].avatar);
+
+        console.log("Avatar data:", avatarData);
+        return { profile, avatarData };
+      } else {
+        return { profile };
+      }
     }
   } catch (error: any) {
     console.error("Error getting profile:", error.message);
