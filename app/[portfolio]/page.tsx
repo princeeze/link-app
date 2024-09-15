@@ -31,6 +31,7 @@ export default function Page({ params }: { params: { portfolio: string } }) {
     const profileResult = await getProfile(params.portfolio);
 
     setAuthStatus(profileResult.authStatus);
+    console.log(authStatus);
 
     if (profileResult?.profile && profileResult.profile.length > 0) {
       const firstProfile = profileResult.profile[0];
@@ -68,6 +69,8 @@ export default function Page({ params }: { params: { portfolio: string } }) {
   useEffect(() => {
     if (fetchedData === false) {
       getData();
+    } else {
+      setAuthStatus(true);
     }
   }, []);
 

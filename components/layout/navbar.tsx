@@ -9,16 +9,14 @@ import { logout } from "@/app/(auth)/auth-client";
 import logoSmall from "@/public/logo-small.svg";
 import logo from "@/public/logo.svg";
 import {
-  ClipboardText,
+  Eye,
   Link as LinkLogo,
-  Share,
   SignOut,
   Smiley,
-  SmileyMelting,
   UserCircle,
 } from "@phosphor-icons/react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -66,32 +64,6 @@ export default function Navbar() {
     }
   }, [lastScrollY]);
 
-  const handleShare = () => {
-    if (profileStore.username) {
-      navigator.clipboard.writeText(profileStore.username);
-      toast({
-        icon: (
-          <ClipboardText
-            weight="fill"
-            size={20}
-            className="animate-bounce text-grey-default duration-500"
-          />
-        ),
-        title: "Copied to clipboard!",
-      });
-    } else {
-      toast({
-        icon: (
-          <SmileyMelting
-            weight="fill"
-            size={20}
-            className="text-grey-default"
-          />
-        ),
-        title: "Set a username first!",
-      });
-    }
-  };
   return (
     <div
       className={cn(
@@ -135,14 +107,15 @@ export default function Navbar() {
         >
           <SignOut weight="bold" size={20} />
         </Button>
-        <Button
-          variant={"secondary"}
-          className="px-3 py-3 sm:px-[27px] sm:py-[11px]"
-          onClick={handleShare}
+        <Link
+          className={buttonVariants({
+            variant: "secondary",
+          })}
+          href={`/${profileStore.username}`}
         >
-          <Share weight="bold" size={20} className="sm:hidden" />
-          <span className="hidden sm:inline">Share</span>
-        </Button>
+          <Eye weight="bold" size={20} className="sm:hidden" />
+          <span className="hidden sm:inline">Preview</span>
+        </Link>
       </div>
     </div>
   );

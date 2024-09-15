@@ -1,6 +1,5 @@
 import MobilePhone from "@/components/layout/mobilephone";
 import Navbar from "@/components/layout/navbar";
-import ResponsiveMobilePhone from "@/components/layout/responsive-mobile-phone";
 
 export default function DashboardLayout({
   children,
@@ -19,7 +18,6 @@ export default function DashboardLayout({
             </div>
           </main>
         </div>
-        <ResponsiveMobilePhone />
       </div>
     </section>
   );
