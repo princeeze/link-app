@@ -1,0 +1,10 @@
+- [x] Fix placeholder issue
+- [x] Fix aggressive validation
+- [x] Make routing better
+- [x] Fix url validation
+- [x] Fix typing link closes input
+- [x] Add shimmer on loading
+- [x] Fix error message display
+- [x] Change profile email to title
+- [x] Add floating mobile preview
+- [x] Fix platform fetch errors

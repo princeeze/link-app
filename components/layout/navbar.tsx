@@ -16,7 +16,7 @@ import {
   UserCircle,
 } from "@phosphor-icons/react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -27,6 +27,7 @@ export default function Navbar() {
   const [isSticky, setIsSticky] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const resetStore = useFormDataStore((state) => state.resetStore);
+  const profileStore = useFormDataStore((state) => state.profileStore);
 
   const handleLogout = async () => {
     // clear stores
@@ -66,7 +67,7 @@ export default function Navbar() {
   return (
     <div
       className={cn(
-        "z-50 flex w-full items-center justify-between rounded-xl bg-white px-3 py-2 transition-all duration-300 ease-in-out sm:px-6",
+        "z-20 flex w-full items-center justify-between rounded-xl bg-white px-3 py-2 transition-all duration-300 ease-in-out sm:px-6",
         isSticky ? "sticky top-0 bg-white" : "bg-white",
       )}
     >
@@ -76,11 +77,11 @@ export default function Navbar() {
         <Link
           className={cn(
             "heading-s flex items-center gap-2 rounded-lg px-6 py-[11px] hover:text-purple-default sm:px-[27px]",
-            pathname === "/dashboard/links"
+            pathname === "/links"
               ? "bg-purple-light text-purple-default"
               : "bg-white text-grey-default",
           )}
-          href={"/dashboard/links"}
+          href={"/links"}
         >
           <LinkLogo weight="bold" className="h-5 w-5 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline"> Links</span>
@@ -88,11 +89,11 @@ export default function Navbar() {
         <Link
           className={cn(
             "heading-s flex items-center gap-2 rounded-lg px-6 py-[11px] hover:text-purple-default sm:px-[27px]",
-            pathname === "/dashboard/profile"
+            pathname === "/profile"
               ? "bg-purple-light text-purple-default"
               : "bg-white text-grey-default",
           )}
-          href={"/dashboard/profile"}
+          href={"/profile"}
         >
           <UserCircle weight="bold" className="h-5 w-5 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline"> Profile</span>
@@ -106,13 +107,15 @@ export default function Navbar() {
         >
           <SignOut weight="bold" size={20} />
         </Button>
-        <Button
-          variant={"secondary"}
-          className="px-3 py-3 sm:px-[27px] sm:py-[11px]"
+        <Link
+          className={buttonVariants({
+            variant: "secondary",
+          })}
+          href={`/${profileStore.username}`}
         >
           <Eye weight="bold" size={20} className="sm:hidden" />
           <span className="hidden sm:inline">Preview</span>
-        </Button>
+        </Link>
       </div>
     </div>
   );

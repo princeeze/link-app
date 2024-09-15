@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/prefer-module */
-
 import type { Config } from "tailwindcss";
 
 // const defaultTheme = require("tailwindcss/defaultTheme");

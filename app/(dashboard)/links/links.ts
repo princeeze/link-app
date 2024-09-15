@@ -5,17 +5,32 @@ import { z } from "zod";
 import { createClient } from "@/utils/supabase/server";
 import { linkFormSchema, linkSchema } from "@/lib/schema";
 
-export async function getLinks() {
+export async function getLinks(username?: string) {
   const supabase = createClient();
+  let userId: string;
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error("User is not authenticated");
+    if (username) {
+      const { data: profile, error } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("username", username);
+      if (error) {
+        throw error;
+      }
+
+      userId = profile[0].user_id;
+      console.log(userId);
+    } else {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("User is not authenticated");
+      }
+
+      userId = user.id;
     }
 
-    const userId = user.id;
     const { data, error } = await supabase
       .from("links")
       .select("*")
@@ -28,7 +43,7 @@ export async function getLinks() {
       platform: link.platform,
       link: link.link,
     }));
-
+    console.log(links);
     return links;
   } catch (error: any) {
     return { error: error.message };
