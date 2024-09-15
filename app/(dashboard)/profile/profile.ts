@@ -131,9 +131,19 @@ export async function checkUsernameAvailability(username: string) {
 
 export async function getProfile(username?: string) {
   const supabase = createClient();
+  let authStatus = false;
   try {
-    //check if username is provided
+    //If username is provided
     if (username) {
+      //Check auth
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        authStatus = true;
+      }
+
       const { data: profile, error } = await supabase
         .from("profile")
         .select("*")
@@ -141,18 +151,15 @@ export async function getProfile(username?: string) {
       if (error) {
         throw error;
       }
-      console.log("Profile data:", profile);
       // Get avatar URL from Supabase
       if (profile.length > 0) {
-        console.log("Avatar URL:", profile[0].avatar);
         const { data: avatarData } = supabase.storage
           .from("avatars")
           .getPublicUrl(profile[0].avatar);
 
-        console.log("Avatar data:", avatarData);
-        return { profile, avatarData };
+        return { profile, avatarData, authStatus };
       } else {
-        return { profile };
+        return { profile, authStatus };
       }
     } else {
       // Validate user
@@ -168,7 +175,6 @@ export async function getProfile(username?: string) {
       if (!user) {
         throw new Error("User is not authenticated");
       }
-
       const userId = user.id;
       // Get profile data from Supabase
       const { data: profile, error } = await supabase
@@ -187,9 +193,9 @@ export async function getProfile(username?: string) {
           .getPublicUrl(profile[0].avatar);
 
         console.log("Avatar data:", avatarData);
-        return { profile, avatarData };
+        return { profile, avatarData, authStatus };
       } else {
-        return { profile };
+        return { profile, authStatus };
       }
     }
   } catch (error: any) {
