@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { loginSchema } from "@/lib/schema";
+import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
@@ -40,12 +41,11 @@ export default function AuthForm() {
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  /* const [successMessage, setSuccessMessage] = React.useState<string | null>(
-    null,
-  ); */
+  const resetStore = useFormDataStore((state) => state.resetStore);
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
+    resetStore();
     setIsLoading(true);
     const result = await login(values);
     if (result.error) {

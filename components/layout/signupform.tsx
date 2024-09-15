@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { loginSchema, signupSchema } from "@/lib/schema";
+import { useFormDataStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 
@@ -42,8 +43,10 @@ export default function SignupForm() {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const router = useRouter();
+  const resetStore = useFormDataStore((state) => state.resetStore);
 
   async function onSubmit(values: z.infer<typeof signupSchema>) {
+    resetStore();
     setIsLoading(true);
     const result = await signup(values);
 
