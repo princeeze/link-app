@@ -16,7 +16,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
+          cookiesToSet.forEach(({ name, value, options }) =>
             request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
@@ -39,11 +39,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const protectedPaths = ["/links", "/profile"];
-  const isProtectedDynamicPath = protectedPaths.some((path) =>
+
+  const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path),
   );
 
-  if (!user && isProtectedDynamicPath) {
+  if (!user && isProtectedPath) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = "/login";
