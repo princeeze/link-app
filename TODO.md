@@ -6,5 +6,5 @@
 - [x] Add shimmer on loading
 - [x] Fix error message display
 - [x] Change profile email to title
-- [ ] Add floating mobile preview
+- [x] Add floating mobile preview
 - [x] Fix platform fetch errors
