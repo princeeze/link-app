@@ -13,6 +13,7 @@ import {
   Link as LinkLogo,
   SignOut,
   Smiley,
+  SmileyMelting,
   UserCircle,
 } from "@phosphor-icons/react";
 
@@ -64,6 +65,15 @@ export default function Navbar() {
     }
   }, [lastScrollY]);
 
+  const handleNoProfile = () => {
+    toast({
+      icon: (
+        <SmileyMelting weight="fill" size={20} className="text-grey-default" />
+      ),
+      title: "You need a username to preview",
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -107,15 +117,22 @@ export default function Navbar() {
         >
           <SignOut weight="bold" size={20} />
         </Button>
-        <Link
-          className={buttonVariants({
-            variant: "secondary",
-          })}
-          href={`/${profileStore.username}`}
-        >
-          <Eye weight="bold" size={20} className="sm:hidden" />
-          <span className="hidden sm:inline">Preview</span>
-        </Link>
+        {profileStore.username ? (
+          <Link
+            className={buttonVariants({
+              variant: "secondary",
+            })}
+            href={`/${profileStore.username}`}
+          >
+            <Eye weight="bold" size={20} className="sm:hidden" />
+            <span className="hidden sm:inline">Preview</span>
+          </Link>
+        ) : (
+          <Button variant={"secondary"} onClick={handleNoProfile}>
+            <Eye weight="bold" size={20} className="sm:hidden" />
+            <span className="hidden sm:inline">Preview</span>
+          </Button>
+        )}
       </div>
     </div>
   );
